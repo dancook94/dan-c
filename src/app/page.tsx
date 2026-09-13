@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Container } from "@/components/container";
-import { Disclaimer } from "@/components/disclaimer";
 import { LineChart } from "@/components/line-chart";
 import { StatCard } from "@/components/stat-card";
 import { formatNumber, formatPercent } from "@/lib/format";
@@ -73,8 +72,6 @@ export default async function HomePage() {
             }))}
           />
         </section>
-
-        <Disclaimer className="mt-10" />
       </Container>
     </div>
   );

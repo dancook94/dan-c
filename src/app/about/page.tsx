@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Container } from "@/components/container";
-import { Disclaimer } from "@/components/disclaimer";
 
 export const metadata: Metadata = {
   title: "About",
@@ -105,8 +104,6 @@ export default function AboutPage() {
             </p>
           </div>
         </section>
-
-        <Disclaimer className="mt-12" compact />
       </Container>
     </div>
   );

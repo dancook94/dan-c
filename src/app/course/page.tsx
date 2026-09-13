@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/container";
-import { Disclaimer } from "@/components/disclaimer";
 import { WaitlistForm } from "@/components/waitlist-form";
 
 export const metadata: Metadata = {
@@ -30,7 +29,6 @@ export default function CoursePage() {
         </ul>
 
         <WaitlistForm />
-        <Disclaimer className="mt-12" />
       </Container>
     </div>
   );

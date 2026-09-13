@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Container } from "@/components/container";
-import { Disclaimer } from "@/components/disclaimer";
 
 export const metadata: Metadata = {
   title: "Method",
@@ -87,8 +86,6 @@ export default function MethodPage() {
             — is the evidence, not the prose.
           </p>
         </section>
-
-        <Disclaimer className="mt-12" />
       </Container>
     </div>
   );
