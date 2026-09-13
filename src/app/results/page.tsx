@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Container } from "@/components/container";
 import { LineChart } from "@/components/line-chart";
 import { MonthlyTable } from "@/components/monthly-table";
@@ -38,7 +39,12 @@ export default async function ResultsPage() {
             </h1>
             <p className="mt-2 text-ink-muted">
               Performance summary and key metrics. Figures are shown only when
-              exported from the live book — never invented for this page.
+              exported from the live book — never invented for this page. The
+              historical H4 Donchian research sits on{" "}
+              <Link href="/backtesting" className="font-medium text-accent hover:text-accent-hover">
+                Backtesting
+              </Link>
+              ; it is not this live track record.
             </p>
           </div>
           <RangePills />
