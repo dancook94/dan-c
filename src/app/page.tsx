@@ -34,6 +34,16 @@ export default async function HomePage() {
             Join the course waitlist →
           </Link>
         </div>
+        <p className="mt-5 max-w-2xl text-sm text-ink-muted">
+          Historical H4 Donchian research lives on{" "}
+          <Link
+            href="/backtesting"
+            className="font-medium text-accent hover:text-accent-hover"
+          >
+            Backtesting
+          </Link>
+          . That page is a hypothetical backtest, not the live book.
+        </p>
 
         <section
           aria-label="Performance snapshot"

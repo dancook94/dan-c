@@ -20,6 +20,9 @@ export function SiteFooter() {
             <Link href="/results" className="text-ink-muted hover:text-ink">
               Results
             </Link>
+            <Link href="/backtesting" className="text-ink-muted hover:text-ink">
+              Backtesting
+            </Link>
             <Link href="/method" className="text-ink-muted hover:text-ink">
               Method
             </Link>

@@ -56,7 +56,15 @@ export default function AboutPage() {
               <Link href="/results" className="font-medium text-accent hover:text-accent-hover">
                 results
               </Link>{" "}
-              page that stays empty until live figures are exported.
+              page that stays empty until paper or live figures are exported.
+            </li>
+            <li>
+              A{" "}
+              <Link href="/backtesting" className="font-medium text-accent hover:text-accent-hover">
+                backtesting
+              </Link>{" "}
+              page for the historical H4 Donchian research book. That is
+              hypothetical. It is not a live track record.
             </li>
             <li>
               A{" "}
@@ -93,8 +101,10 @@ export default function AboutPage() {
               of your initial investment. You should not invest money that you
               cannot afford to lose. Past performance, whether live or
               hypothetical, is not a reliable indicator of future results.
-              Figures on this site appear only when they are exported from the
-              live book. Placeholders are not performance.
+              Paper and live figures appear only when they are exported from
+              that book. The Backtesting page publishes a historical,
+              hypothetical research book and must not be read as a live track
+              record. Placeholders are not performance.
             </p>
             <p>
               Nothing on dan-c.co.uk is financial, investment, tax, or legal

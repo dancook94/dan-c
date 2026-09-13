@@ -9,6 +9,7 @@ import { Wordmark } from "@/components/wordmark";
 const NAV = [
   { href: "/", label: "Home" },
   { href: "/results", label: "Results" },
+  { href: "/backtesting", label: "Backtesting" },
   { href: "/method", label: "Method" },
   { href: "/course", label: "Course" },
   { href: "/about", label: "About" },
@@ -38,7 +39,7 @@ export function SiteHeader() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                className={`rounded-md px-2.5 py-2 text-sm font-medium transition-colors ${
                   active
                     ? "text-ink"
                     : "text-ink-muted hover:text-ink"

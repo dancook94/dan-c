@@ -1,0 +1,45 @@
+{
+  "source": "scaffold-until-fxday-export",
+  "status": "pending_export",
+  "currency": "GBP",
+  "note": "Per-market rows stay empty until Trading Ted / fxday drops the export. Gold’s ~49% share of profits is an approved portfolio caveat, not a filled P&L line.",
+  "markets": [
+    {
+      "symbol": "US30",
+      "label": "US 30",
+      "trades": null,
+      "winRate": null,
+      "pnl": null,
+      "shareOfProfits": null,
+      "status": "pending_export"
+    },
+    {
+      "symbol": "NAS100",
+      "label": "NAS 100",
+      "trades": null,
+      "winRate": null,
+      "pnl": null,
+      "shareOfProfits": null,
+      "status": "pending_export"
+    },
+    {
+      "symbol": "XAUUSD",
+      "label": "Gold (XAUUSD)",
+      "trades": null,
+      "winRate": null,
+      "pnl": null,
+      "shareOfProfits": 0.49,
+      "status": "approved_caveat",
+      "note": "Approved caveat: gold contributed about 49% of portfolio P&L. Trade count, win rate, and pound P&L await the export."
+    },
+    {
+      "symbol": "DE40",
+      "label": "Germany 40",
+      "trades": null,
+      "winRate": null,
+      "pnl": null,
+      "shareOfProfits": null,
+      "status": "pending_export"
+    }
+  ]
+}

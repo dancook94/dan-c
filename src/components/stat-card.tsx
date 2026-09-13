@@ -15,7 +15,7 @@ export function StatCard({
         {label}
       </p>
       <p
-        className={`mt-3 text-[1.75rem] leading-none font-semibold tracking-tight tabular-nums ${
+        className={`mt-3 text-[1.5rem] leading-tight font-semibold tracking-tight break-words tabular-nums sm:text-[1.75rem] ${
           tone === "negative" && value !== "—" ? "text-negative" : "text-ink"
         }`}
       >

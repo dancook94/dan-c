@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "source": "approved-summary",
+  "status": "historical_backtest",
+  "book": "Multi-market H4 Donchian trend",
+  "currency": "GBP",
+  "sample": {
+    "start": "2016-01-01",
+    "end": "2026-09-01",
+    "label": "2016–2026"
+  },
+  "kpis": {
+    "startingEquity": 5000,
+    "endingEquity": 31097,
+    "cagrPct": 18.7,
+    "maxDrawdownPct": -21,
+    "trades": 1122,
+    "profitFactor": 1.35
+  },
+  "disclaimer": {
+    "historicalOnly": true,
+    "hypothetical": true,
+    "notFinancialAdvice": true,
+    "notLiveTrackRecord": true,
+    "doNotMarketAs20Pct": true
+  },
+  "caveats": [
+    {
+      "id": "in-sample-cagr",
+      "text": "In-sample CAGR was about 14% to the end of 2023."
+    },
+    {
+      "id": "gold-share",
+      "text": "Gold (XAUUSD) accounted for about 49% of portfolio P&L."
+    },
+    {
+      "id": "year-2022",
+      "text": "The 2022 calendar return was about −16%."
+    },
+    {
+      "id": "not-20-percent",
+      "text": "Full-sample CAGR is 18.7%. That is not a clean “20%” claim and must not be marketed as 20%."
+    }
+  ]
+}

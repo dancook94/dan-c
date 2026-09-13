@@ -13,13 +13,14 @@ export function formatMetric(
 export function formatMoney(
   value: number | null | undefined,
   currency: ResultsCurrency = "GBP",
+  digits = 2,
 ): string {
   return formatMetric(value, (n) =>
     new Intl.NumberFormat("en-GB", {
       style: "currency",
       currency,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
     }).format(n),
   );
 }

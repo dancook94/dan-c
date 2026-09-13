@@ -1,0 +1,76 @@
+{
+  "source": "scaffold-until-fxday-export",
+  "status": "pending_export",
+  "currency": "GBP",
+  "note": "Only the 2022 calendar return (−16%) is an approved yearly figure. Other years stay empty until the fxday export. Do not read yearly returns off the illustrative equity chart.",
+  "years": [
+    {
+      "year": 2016,
+      "returnPct": null,
+      "trades": null,
+      "status": "pending_export"
+    },
+    {
+      "year": 2017,
+      "returnPct": null,
+      "trades": null,
+      "status": "pending_export"
+    },
+    {
+      "year": 2018,
+      "returnPct": null,
+      "trades": null,
+      "status": "pending_export"
+    },
+    {
+      "year": 2019,
+      "returnPct": null,
+      "trades": null,
+      "status": "pending_export"
+    },
+    {
+      "year": 2020,
+      "returnPct": null,
+      "trades": null,
+      "status": "pending_export"
+    },
+    {
+      "year": 2021,
+      "returnPct": null,
+      "trades": null,
+      "status": "pending_export"
+    },
+    {
+      "year": 2022,
+      "returnPct": -16,
+      "trades": null,
+      "status": "approved_caveat",
+      "note": "Approved caveat: 2022 return ≈ −16%."
+    },
+    {
+      "year": 2023,
+      "returnPct": null,
+      "trades": null,
+      "status": "pending_export"
+    },
+    {
+      "year": 2024,
+      "returnPct": null,
+      "trades": null,
+      "status": "pending_export"
+    },
+    {
+      "year": 2025,
+      "returnPct": null,
+      "trades": null,
+      "status": "pending_export"
+    },
+    {
+      "year": 2026,
+      "returnPct": null,
+      "trades": null,
+      "status": "pending_export",
+      "partial": true
+    }
+  ]
+}

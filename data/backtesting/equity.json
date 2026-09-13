@@ -1,0 +1,1041 @@
+{
+  "source": "scaffold-until-fxday-export",
+  "currency": "GBP",
+  "note": "Illustrative monthly reconstruction for chart display. Not the fxday trade-by-trade equity series. Locked endpoints: £5,000 start, £31,097 end, max drawdown character about −21%, 2022 calendar return about −16%.",
+  "points": [
+    {
+      "date": "2016-01-01",
+      "equity": 5000
+    },
+    {
+      "date": "2016-02-01",
+      "equity": 5126.92
+    },
+    {
+      "date": "2016-03-01",
+      "equity": 5201.38
+    },
+    {
+      "date": "2016-04-01",
+      "equity": 5244.66
+    },
+    {
+      "date": "2016-05-01",
+      "equity": 5321.4
+    },
+    {
+      "date": "2016-06-01",
+      "equity": 5442.08
+    },
+    {
+      "date": "2016-07-01",
+      "equity": 5545.45
+    },
+    {
+      "date": "2016-08-01",
+      "equity": 5589.88
+    },
+    {
+      "date": "2016-09-01",
+      "equity": 5619.02
+    },
+    {
+      "date": "2016-10-01",
+      "equity": 5701.42
+    },
+    {
+      "date": "2016-11-01",
+      "equity": 5830.77
+    },
+    {
+      "date": "2016-12-01",
+      "equity": 5935.32
+    },
+    {
+      "date": "2017-01-01",
+      "equity": 6000
+    },
+    {
+      "date": "2017-02-01",
+      "equity": 6064.34
+    },
+    {
+      "date": "2017-03-01",
+      "equity": 6206.04
+    },
+    {
+      "date": "2017-04-01",
+      "equity": 6379.37
+    },
+    {
+      "date": "2017-05-01",
+      "equity": 6503.01
+    },
+    {
+      "date": "2017-06-01",
+      "equity": 6563.34
+    },
+    {
+      "date": "2017-07-01",
+      "equity": 6635.28
+    },
+    {
+      "date": "2017-08-01",
+      "equity": 6771.47
+    },
+    {
+      "date": "2017-09-01",
+      "equity": 6922.86
+    },
+    {
+      "date": "2017-10-01",
+      "equity": 7011.82
+    },
+    {
+      "date": "2017-11-01",
+      "equity": 7051.69
+    },
+    {
+      "date": "2017-12-01",
+      "equity": 7133.22
+    },
+    {
+      "date": "2018-01-01",
+      "equity": 7320
+    },
+    {
+      "date": "2018-02-01",
+      "equity": 7409.71
+    },
+    {
+      "date": "2018-03-01",
+      "equity": 7456.76
+    },
+    {
+      "date": "2018-04-01",
+      "equity": 7468.57
+    },
+    {
+      "date": "2018-05-01",
+      "equity": 7535.83
+    },
+    {
+      "date": "2018-06-01",
+      "equity": 7666.97
+    },
+    {
+      "date": "2018-07-01",
+      "equity": 7770.5
+    },
+    {
+      "date": "2018-08-01",
+      "equity": 7787.53
+    },
+    {
+      "date": "2018-09-01",
+      "equity": 7779.16
+    },
+    {
+      "date": "2018-10-01",
+      "equity": 7837.55
+    },
+    {
+      "date": "2018-11-01",
+      "equity": 7950.86
+    },
+    {
+      "date": "2018-12-01",
+      "equity": 8022.89
+    },
+    {
+      "date": "2019-01-01",
+      "equity": 8052
+    },
+    {
+      "date": "2019-02-01",
+      "equity": 8124.31
+    },
+    {
+      "date": "2019-03-01",
+      "equity": 8318.65
+    },
+    {
+      "date": "2019-04-01",
+      "equity": 8561.92
+    },
+    {
+      "date": "2019-05-01",
+      "equity": 8745.73
+    },
+    {
+      "date": "2019-06-01",
+      "equity": 8852.97
+    },
+    {
+      "date": "2019-07-01",
+      "equity": 8982.97
+    },
+    {
+      "date": "2019-08-01",
+      "equity": 9200.97
+    },
+    {
+      "date": "2019-09-01",
+      "equity": 9434.12
+    },
+    {
+      "date": "2019-10-01",
+      "equity": 9574.19
+    },
+    {
+      "date": "2019-11-01",
+      "equity": 9639.53
+    },
+    {
+      "date": "2019-12-01",
+      "equity": 9753.62
+    },
+    {
+      "date": "2020-01-01",
+      "equity": 9984
+    },
+    {
+      "date": "2020-02-01",
+      "equity": 10800
+    },
+    {
+      "date": "2020-03-01",
+      "equity": 10141.87
+    },
+    {
+      "date": "2020-04-01",
+      "equity": 9500
+    },
+    {
+      "date": "2020-05-01",
+      "equity": 9671.37
+    },
+    {
+      "date": "2020-06-01",
+      "equity": 10019.97
+    },
+    {
+      "date": "2020-07-01",
+      "equity": 10342.43
+    },
+    {
+      "date": "2020-08-01",
+      "equity": 10556.97
+    },
+    {
+      "date": "2020-09-01",
+      "equity": 10740.43
+    },
+    {
+      "date": "2020-10-01",
+      "equity": 11013.91
+    },
+    {
+      "date": "2020-11-01",
+      "equity": 11356.55
+    },
+    {
+      "date": "2020-12-01",
+      "equity": 11628.9
+    },
+    {
+      "date": "2021-01-01",
+      "equity": 11782
+    },
+    {
+      "date": "2021-02-01",
+      "equity": 11819.28
+    },
+    {
+      "date": "2021-03-01",
+      "equity": 11982.53
+    },
+    {
+      "date": "2021-04-01",
+      "equity": 12210.86
+    },
+    {
+      "date": "2021-05-01",
+      "equity": 12355.53
+    },
+    {
+      "date": "2021-06-01",
+      "equity": 12403.06
+    },
+    {
+      "date": "2021-07-01",
+      "equity": 12499
+    },
+    {
+      "date": "2021-08-01",
+      "equity": 12730.44
+    },
+    {
+      "date": "2021-09-01",
+      "equity": 12988.98
+    },
+    {
+      "date": "2021-10-01",
+      "equity": 13122.79
+    },
+    {
+      "date": "2021-11-01",
+      "equity": 13157.07
+    },
+    {
+      "date": "2021-12-01",
+      "equity": 13254.96
+    },
+    {
+      "date": "2022-01-01",
+      "equity": 13431
+    },
+    {
+      "date": "2022-02-01",
+      "equity": 13062.65
+    },
+    {
+      "date": "2022-03-01",
+      "equity": 12517.62
+    },
+    {
+      "date": "2022-04-01",
+      "equity": 11926
+    },
+    {
+      "date": "2022-05-01",
+      "equity": 11441.19
+    },
+    {
+      "date": "2022-06-01",
+      "equity": 11061.73
+    },
+    {
+      "date": "2022-07-01",
+      "equity": 10610
+    },
+    {
+      "date": "2022-08-01",
+      "equity": 10712.51
+    },
+    {
+      "date": "2022-09-01",
+      "equity": 10761.21
+    },
+    {
+      "date": "2022-10-01",
+      "equity": 10912.27
+    },
+    {
+      "date": "2022-11-01",
+      "equity": 11135.04
+    },
+    {
+      "date": "2022-12-01",
+      "equity": 11286.76
+    },
+    {
+      "date": "2023-01-01",
+      "equity": 11282
+    },
+    {
+      "date": "2023-02-01",
+      "equity": 11486.82
+    },
+    {
+      "date": "2023-03-01",
+      "equity": 11763.15
+    },
+    {
+      "date": "2023-04-01",
+      "equity": 12089.37
+    },
+    {
+      "date": "2023-05-01",
+      "equity": 12321.64
+    },
+    {
+      "date": "2023-06-01",
+      "equity": 12452.07
+    },
+    {
+      "date": "2023-07-01",
+      "equity": 12632.68
+    },
+    {
+      "date": "2023-08-01",
+      "equity": 12956.68
+    },
+    {
+      "date": "2023-09-01",
+      "equity": 13317.83
+    },
+    {
+      "date": "2023-10-01",
+      "equity": 13563.59
+    },
+    {
+      "date": "2023-11-01",
+      "equity": 13721.16
+    },
+    {
+      "date": "2023-12-01",
+      "equity": 13957.38
+    },
+    {
+      "date": "2024-01-01",
+      "equity": 14263
+    },
+    {
+      "date": "2024-02-01",
+      "equity": 14959.17
+    },
+    {
+      "date": "2024-03-01",
+      "equity": 15430.57
+    },
+    {
+      "date": "2024-04-01",
+      "equity": 15817.08
+    },
+    {
+      "date": "2024-05-01",
+      "equity": 16317.26
+    },
+    {
+      "date": "2024-06-01",
+      "equity": 16956.29
+    },
+    {
+      "date": "2024-07-01",
+      "equity": 17542.75
+    },
+    {
+      "date": "2024-08-01",
+      "equity": 17957.6
+    },
+    {
+      "date": "2024-09-01",
+      "equity": 18350.22
+    },
+    {
+      "date": "2024-10-01",
+      "equity": 18932.03
+    },
+    {
+      "date": "2024-11-01",
+      "equity": 19658.4
+    },
+    {
+      "date": "2024-12-01",
+      "equity": 20279.67
+    },
+    {
+      "date": "2025-01-01",
+      "equity": 20681
+    },
+    {
+      "date": "2025-02-01",
+      "equity": 21206.95
+    },
+    {
+      "date": "2025-03-01",
+      "equity": 21912.71
+    },
+    {
+      "date": "2025-04-01",
+      "equity": 22698.75
+    },
+    {
+      "date": "2025-05-01",
+      "equity": 23288.17
+    },
+    {
+      "date": "2025-06-01",
+      "equity": 23664.22
+    },
+    {
+      "date": "2025-07-01",
+      "equity": 24114.78
+    },
+    {
+      "date": "2025-08-01",
+      "equity": 24818.59
+    },
+    {
+      "date": "2025-09-01",
+      "equity": 25579.43
+    },
+    {
+      "date": "2025-10-01",
+      "equity": 26119.03
+    },
+    {
+      "date": "2025-11-01",
+      "equity": 26506.86
+    },
+    {
+      "date": "2025-12-01",
+      "equity": 27075.89
+    },
+    {
+      "date": "2026-01-01",
+      "equity": 27920
+    },
+    {
+      "date": "2026-02-01",
+      "equity": 28549.17
+    },
+    {
+      "date": "2026-03-01",
+      "equity": 28874.45
+    },
+    {
+      "date": "2026-04-01",
+      "equity": 29061.56
+    },
+    {
+      "date": "2026-05-01",
+      "equity": 29460.33
+    },
+    {
+      "date": "2026-06-01",
+      "equity": 30081.29
+    },
+    {
+      "date": "2026-07-01",
+      "equity": 30568.1
+    },
+    {
+      "date": "2026-08-01",
+      "equity": 30728.7
+    },
+    {
+      "date": "2026-09-01",
+      "equity": 31097
+    }
+  ],
+  "drawdown": [
+    {
+      "date": "2016-01-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2016-02-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2016-03-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2016-04-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2016-05-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2016-06-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2016-07-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2016-08-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2016-09-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2016-10-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2016-11-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2016-12-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2017-01-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2017-02-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2017-03-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2017-04-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2017-05-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2017-06-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2017-07-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2017-08-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2017-09-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2017-10-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2017-11-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2017-12-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2018-01-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2018-02-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2018-03-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2018-04-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2018-05-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2018-06-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2018-07-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2018-08-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2018-09-01",
+      "drawdownPct": -0.11
+    },
+    {
+      "date": "2018-10-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2018-11-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2018-12-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2019-01-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2019-02-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2019-03-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2019-04-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2019-05-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2019-06-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2019-07-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2019-08-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2019-09-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2019-10-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2019-11-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2019-12-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2020-01-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2020-02-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2020-03-01",
+      "drawdownPct": -6.09
+    },
+    {
+      "date": "2020-04-01",
+      "drawdownPct": -12.04
+    },
+    {
+      "date": "2020-05-01",
+      "drawdownPct": -10.45
+    },
+    {
+      "date": "2020-06-01",
+      "drawdownPct": -7.22
+    },
+    {
+      "date": "2020-07-01",
+      "drawdownPct": -4.24
+    },
+    {
+      "date": "2020-08-01",
+      "drawdownPct": -2.25
+    },
+    {
+      "date": "2020-09-01",
+      "drawdownPct": -0.55
+    },
+    {
+      "date": "2020-10-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2020-11-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2020-12-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2021-01-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2021-02-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2021-03-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2021-04-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2021-05-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2021-06-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2021-07-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2021-08-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2021-09-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2021-10-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2021-11-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2021-12-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2022-01-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2022-02-01",
+      "drawdownPct": -2.74
+    },
+    {
+      "date": "2022-03-01",
+      "drawdownPct": -6.8
+    },
+    {
+      "date": "2022-04-01",
+      "drawdownPct": -11.21
+    },
+    {
+      "date": "2022-05-01",
+      "drawdownPct": -14.82
+    },
+    {
+      "date": "2022-06-01",
+      "drawdownPct": -17.64
+    },
+    {
+      "date": "2022-07-01",
+      "drawdownPct": -21
+    },
+    {
+      "date": "2022-08-01",
+      "drawdownPct": -20.24
+    },
+    {
+      "date": "2022-09-01",
+      "drawdownPct": -19.88
+    },
+    {
+      "date": "2022-10-01",
+      "drawdownPct": -18.75
+    },
+    {
+      "date": "2022-11-01",
+      "drawdownPct": -17.09
+    },
+    {
+      "date": "2022-12-01",
+      "drawdownPct": -15.96
+    },
+    {
+      "date": "2023-01-01",
+      "drawdownPct": -16
+    },
+    {
+      "date": "2023-02-01",
+      "drawdownPct": -14.48
+    },
+    {
+      "date": "2023-03-01",
+      "drawdownPct": -12.42
+    },
+    {
+      "date": "2023-04-01",
+      "drawdownPct": -9.99
+    },
+    {
+      "date": "2023-05-01",
+      "drawdownPct": -8.26
+    },
+    {
+      "date": "2023-06-01",
+      "drawdownPct": -7.29
+    },
+    {
+      "date": "2023-07-01",
+      "drawdownPct": -5.94
+    },
+    {
+      "date": "2023-08-01",
+      "drawdownPct": -3.53
+    },
+    {
+      "date": "2023-09-01",
+      "drawdownPct": -0.84
+    },
+    {
+      "date": "2023-10-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2023-11-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2023-12-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2024-01-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2024-02-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2024-03-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2024-04-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2024-05-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2024-06-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2024-07-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2024-08-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2024-09-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2024-10-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2024-11-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2024-12-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2025-01-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2025-02-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2025-03-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2025-04-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2025-05-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2025-06-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2025-07-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2025-08-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2025-09-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2025-10-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2025-11-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2025-12-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2026-01-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2026-02-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2026-03-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2026-04-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2026-05-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2026-06-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2026-07-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2026-08-01",
+      "drawdownPct": 0
+    },
+    {
+      "date": "2026-09-01",
+      "drawdownPct": 0
+    }
+  ]
+}

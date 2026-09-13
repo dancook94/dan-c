@@ -1,0 +1,7 @@
+{
+  "source": "scaffold-until-fxday-export",
+  "status": "pending_export",
+  "currency": "GBP",
+  "note": "Empty on purpose. Drop the fxday / Trading Ted trade export here — do not invent fills.",
+  "trades": []
+}
