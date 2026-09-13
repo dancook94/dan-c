@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "status": "coming_soon",
+  "asOf": null,
+  "currency": "GBP",
+  "account": {
+    "label": "Live track record",
+    "startingEquity": null
+  },
+  "kpis": {
+    "netPnl": null,
+    "winRate": null,
+    "profitFactor": null,
+    "maxDrawdown": null,
+    "avgTrade": null
+  },
+  "equityCurve": [],
+  "drawdown": [],
+  "monthlyReturns": [],
+  "trades": []
+}
