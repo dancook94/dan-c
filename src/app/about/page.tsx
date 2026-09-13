@@ -60,6 +60,14 @@ export default function AboutPage() {
             </li>
             <li>
               A{" "}
+              <Link href="/backtesting" className="font-medium text-accent hover:text-accent-hover">
+                backtesting
+              </Link>{" "}
+              deep-dive for the multi-market H4 Donchian research book —
+              hypothetical, and labelled as such.
+            </li>
+            <li>
+              A{" "}
               <Link href="/course" className="font-medium text-accent hover:text-accent-hover">
                 course waitlist
               </Link>{" "}
@@ -93,8 +101,10 @@ export default function AboutPage() {
               of your initial investment. You should not invest money that you
               cannot afford to lose. Past performance, whether live or
               hypothetical, is not a reliable indicator of future results.
-              Figures on this site appear only when they are exported from the
-              live book. Placeholders are not performance.
+              Live figures appear only when they are exported from the live
+              book. Backtests on this site are hypothetical research — they
+              are not a live track record and must not be read as a promise
+              of return. Placeholders are not performance.
             </p>
             <p>
               Nothing on dan-c.co.uk is financial, investment, tax, or legal

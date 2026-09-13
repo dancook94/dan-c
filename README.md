@@ -17,6 +17,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | --- | --- |
 | `/` | Promise, three KPI placeholders, mini equity shell |
 | `/results` | Equity, drawdown, KPIs, monthly table, trade log |
+| `/backtesting` | Hypothetical H4 Donchian multi-market research deep-dive |
 | `/method` | Opening-range breakout v1 in plain English |
 | `/course` | “Build a trading robot” waitlist |
 | `/about` | Who / UK / full risk disclosure |
@@ -65,6 +66,25 @@ Example empty payload (what ships today):
 ```
 
 `POST /api/waitlist` is a stub that validates email and returns `{ ok: true }`. Wire it to a list provider later.
+
+## Backtesting JSON
+
+`/backtesting` reads static files under `public/data/backtesting/`:
+
+| File | Role |
+| --- | --- |
+| `equity_curve.json` | Daily reconstructed equity path + yearly returns + annotations |
+| `trades.json` | Paginated trade table. Ships as a labelled SAMPLE until a full export lands |
+
+Headline KPIs (CAGR, max DD, trade count, profit factor, per-market P&L) are the approved research summary. The equity line is an illustrative reconstruction that hits those checkpoints — it is **not** a raw Dukascopy tick export. Sample trades are prefixed `SAMPLE-` and set `"sample": true`.
+
+To replace later:
+
+1. Overwrite `equity_curve.json` with a research dump that keeps `points[].date` (`YYYY-MM-DD`) and `points[].equity`. Optional: `points[].drawdownPct`, `annotations[]`, `yearlyReturns[]`.
+2. Overwrite `trades.json` with the full 1,122-row book. Set `"sample": false`. Required trade fields: `id`, `market`, `openedAt`, `closedAt`, `side`, `pnl`. Optional: `symbol`, `entry`, `exit`, `rMultiple`, `notes`.
+3. Regenerate the illustrative series with `node scripts/generate-backtesting-data.mjs` only if you still need a placeholder path.
+
+Never present this page as live trading.
 
 ## Deploy on Vercel
 
