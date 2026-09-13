@@ -1,0 +1,42 @@
+@import "tailwindcss";
+@import "../../design/design-tokens.css";
+
+@theme inline {
+  --color-bg: var(--dc-bg);
+  --color-surface: var(--dc-surface);
+  --color-ink: var(--dc-ink);
+  --color-ink-muted: var(--dc-ink-muted);
+  --color-border: var(--dc-border);
+  --color-accent: var(--dc-accent);
+  --color-accent-hover: var(--dc-accent-hover);
+  --color-accent-soft: var(--dc-accent-soft);
+  --color-positive: var(--dc-positive);
+  --color-positive-soft: var(--dc-positive-soft);
+  --color-negative: var(--dc-negative);
+  --color-negative-soft: var(--dc-negative-soft);
+  --color-disclaimer-bg: var(--dc-disclaimer-bg);
+  --color-disclaimer-ink: var(--dc-disclaimer-ink);
+  --font-sans: var(--font-inter), var(--dc-font-sans);
+  --font-mono: var(--font-jetbrains), var(--dc-font-mono);
+  --radius-sm: var(--dc-radius-sm);
+  --radius-md: var(--dc-radius-md);
+  --radius-lg: var(--dc-radius-lg);
+  --radius-pill: var(--dc-radius-pill);
+  --shadow-card: var(--dc-shadow-card);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--dc-bg);
+  color: var(--dc-ink);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+}
+
+::selection {
+  background: var(--dc-accent-soft);
+  color: var(--dc-ink);
+}

@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://www.dan-c.co.uk/schemas/results.json",
+  "title": "dan-c public results",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "status",
+    "asOf",
+    "currency",
+    "account",
+    "kpis",
+    "equityCurve",
+    "drawdown",
+    "monthlyReturns",
+    "trades"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "status": { "enum": ["coming_soon", "live"] },
+    "asOf": { "type": ["string", "null"], "format": "date" },
+    "currency": { "enum": ["GBP", "USD"] },
+    "account": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "startingEquity"],
+      "properties": {
+        "label": { "type": "string" },
+        "startingEquity": { "type": ["number", "null"] }
+      }
+    },
+    "kpis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "netPnl",
+        "winRate",
+        "profitFactor",
+        "maxDrawdown",
+        "avgTrade"
+      ],
+      "properties": {
+        "netPnl": { "type": ["number", "null"] },
+        "winRate": { "type": ["number", "null"] },
+        "profitFactor": { "type": ["number", "null"] },
+        "maxDrawdown": { "type": ["number", "null"] },
+        "avgTrade": { "type": ["number", "null"] }
+      }
+    },
+    "equityCurve": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["date", "equity"],
+        "properties": {
+          "date": { "type": "string", "format": "date" },
+          "equity": { "type": "number" }
+        }
+      }
+    },
+    "drawdown": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["date", "drawdownPct"],
+        "properties": {
+          "date": { "type": "string", "format": "date" },
+          "drawdownPct": { "type": "number" }
+        }
+      }
+    },
+    "monthlyReturns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "month",
+          "netPnl",
+          "returnPct",
+          "winRate",
+          "trades",
+          "profitFactor"
+        ],
+        "properties": {
+          "month": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}$" },
+          "netPnl": { "type": "number" },
+          "returnPct": { "type": "number" },
+          "winRate": { "type": "number" },
+          "trades": { "type": "integer" },
+          "profitFactor": { "type": "number" }
+        }
+      }
+    },
+    "trades": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "openedAt", "closedAt", "symbol", "side", "pnl", "rMultiple"],
+        "properties": {
+          "id": { "type": "string" },
+          "openedAt": { "type": "string", "format": "date-time" },
+          "closedAt": { "type": "string", "format": "date-time" },
+          "symbol": { "type": "string" },
+          "side": { "enum": ["long", "short"] },
+          "pnl": { "type": "number" },
+          "rMultiple": { "type": ["number", "null"] }
+        }
+      }
+    }
+  }
+}
