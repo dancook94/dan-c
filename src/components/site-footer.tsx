@@ -32,6 +32,12 @@ export function SiteFooter() {
             <Link href="/backtesting/tsmom" className="text-ink-muted hover:text-ink">
               TSMOM
             </Link>
+            <Link
+              href="/backtesting/vol-target"
+              className="text-ink-muted hover:text-ink"
+            >
+              Vol-target
+            </Link>
             <Link href="/method" className="text-ink-muted hover:text-ink">
               Method
             </Link>

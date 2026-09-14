@@ -7,8 +7,8 @@ import { Disclaimer, PerformanceNote } from "@/components/disclaimer";
 import { ResearchArchive } from "@/components/research-archive";
 import { StatCard } from "@/components/stat-card";
 import {
-  DUAL_MOMENTUM_MARKET_FILTERS,
-  DUAL_MOMENTUM_RULES,
+  VOL_TARGET_MARKET_FILTERS,
+  VOL_TARGET_RULES,
 } from "@/lib/backtesting-archive";
 import { downsampleEquity, sourceHowToReplace } from "@/lib/backtesting";
 import {
@@ -28,14 +28,14 @@ import {
 } from "@/lib/format";
 
 export const metadata: Metadata = {
-  title: "Dual momentum backtest",
+  title: "Vol-target SMA200 backtest",
   description:
-    "Hypothetical four-market dual momentum research backtest on Dukascopy history, 2016–2026. Full-sample CAGR +15.05% with −52.18% max drawdown. Not live trading results and not financial advice.",
+    "Hypothetical four-market vol-target SMA200 trend-filter research backtest on Dukascopy history, 2016–2026. Full-sample CAGR +28.17% with −30.33% max drawdown. Not live trading results and not financial advice.",
 };
 
-const BOOK = "dual-momentum";
+const BOOK = "vol-target";
 
-export default async function DualMomentumBacktestPage() {
+export default async function VolTargetBacktestPage() {
   const [equity, trades, summary, markets, years, archive] = await Promise.all([
     loadEquityCurve(BOOK),
     loadBacktestTrades(BOOK),
@@ -49,45 +49,63 @@ export default async function DualMomentumBacktestPage() {
     equity.points,
     equity.annotations.map((item) => item.date),
   );
-  const seriesKind = equity.kind ?? equity.source?.type;
+  const sourceType = equity.source?.type;
+  const pendingDaily =
+    sourceType === "scaffold" || equity.points.length < 2;
+  const isDailyResearch =
+    sourceType === "research_daily" && equity.points.length >= 50;
+  const isInterpolated =
+    sourceType === "checkpoint_interpolated" ||
+    sourceType === "interpolated" ||
+    sourceType === "year_end_interpolated";
   const howToReplace = sourceHowToReplace(equity.source);
   const weekdayCount = new Intl.NumberFormat("en-GB").format(
     equity.points.length,
   );
   const seriesRange = `Series runs from ${equity.startDate} to ${equity.endDate} (${weekdayCount} weekdays; chart downsampled for display).`;
   const maxDd = equity.annotations.find((item) => item.type === "max_drawdown");
-  const isDailyResearch =
-    seriesKind === "research_daily" || equity.source?.type === "research_daily";
-  const chartBadge = isDailyResearch
-    ? "Daily research path"
-    : seriesKind === "year_end_interpolated"
-      ? "Year-end interpolation"
-      : "Research equity path";
   const chartCaption = (
-    isDailyResearch
+    pendingDaily
       ? [
           equity.source.label,
-          seriesRange,
-          "These are real daily research points from the fxday dual-momentum book, downsampled only for display — not year-end interpolation.",
-          maxDd
-            ? `The ${maxDd.label} trough on ${maxDd.date} is marked on the chart.`
-            : "Max drawdown is marked on the chart when present in the series.",
-          "Headline statistics are the locked research summary.",
+          "Locked headlines are on this page. The equity path is waiting for a research daily dump.",
+          `Headline max drawdown ${formatSignedPercent(summary.maxDrawdownPct, 2)} is intra-year.`,
           howToReplace,
         ]
-      : [
-          equity.source.label,
-          seriesRange,
-          "Headline statistics are the locked research summary.",
-          seriesKind === "year_end_interpolated"
-            ? "The line only interpolates published year-end equity — the intra-year max drawdown is not drawn here."
-            : "",
-          howToReplace,
-        ]
+      : isDailyResearch
+        ? [
+            equity.source.label,
+            seriesRange,
+            "These are real daily research points from the fxday vol-target book, downsampled only for display — not checkpoint interpolation.",
+            maxDd
+              ? `The ${maxDd.label} trough on ${maxDd.date} is marked on the chart.`
+              : "Max drawdown is marked on the chart when present in the series.",
+            "Headline statistics are the locked research summary.",
+            howToReplace,
+          ]
+        : [
+            equity.source.label,
+            seriesRange,
+            "Headline statistics are the locked research summary.",
+            isInterpolated
+              ? "The line interpolates locked checkpoints only — not a Dukascopy weekday export."
+              : "",
+            maxDd
+              ? `The ${maxDd.label} trough on 13 March 2020 is marked on the chart.`
+              : `Headline max drawdown ${formatSignedPercent(summary.maxDrawdownPct, 2)} is intra-year.`,
+            howToReplace,
+          ]
   )
     .filter(Boolean)
     .join(" ");
   const { validation } = summary;
+  const chartBadge = pendingDaily
+    ? "Daily dump pending"
+    : isDailyResearch
+      ? "Research daily"
+      : isInterpolated
+        ? "Checkpoint interpolation"
+        : "Research equity path";
 
   return (
     <div className="pb-16">
@@ -96,10 +114,10 @@ export default async function DualMomentumBacktestPage() {
           Hypothetical research · not live trading
         </p>
         <h1 className="mt-2 max-w-3xl text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-          Four-market dual momentum
+          Four-market vol-target SMA200 trend filter
         </h1>
         <p className="mt-4 max-w-3xl text-lg text-ink-muted">
-          A monthly dual-momentum swing book on US30 (USA30), NAS100 (USATECH),
+          A monthly vol-target swing book on US30 (USA30), NAS100 (USATECH),
           XAUUSD (gold), and DE40 (DEU40). History is Dukascopy, after costs,
           January 2016 to August 2026. This is not the{" "}
           <Link
@@ -110,17 +128,17 @@ export default async function DualMomentumBacktestPage() {
           </Link>{" "}
           archive entry, not the{" "}
           <Link
+            href="/backtesting/dual-momentum"
+            className="font-medium text-accent hover:text-accent-hover"
+          >
+            dual-momentum
+          </Link>{" "}
+          book, not the{" "}
+          <Link
             href="/backtesting/tsmom"
             className="font-medium text-accent hover:text-accent-hover"
           >
             12–1 TSMOM
-          </Link>{" "}
-          book, not the{" "}
-          <Link
-            href="/backtesting/vol-target"
-            className="font-medium text-accent hover:text-accent-hover"
-          >
-            vol-target SMA200
           </Link>{" "}
           book, not the live forex day-trading book on{" "}
           <Link
@@ -129,7 +147,7 @@ export default async function DualMomentumBacktestPage() {
           >
             Results
           </Link>
-          , and it is not a clean 20% compound claim.
+          , and it is not a guarantee of 20% compound.
         </p>
 
         <div className="mt-6">
@@ -145,37 +163,31 @@ export default async function DualMomentumBacktestPage() {
           </p>
           <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-ink">
             <li>
-              Full-sample CAGR is{" "}
+              Clears about 20% full-sample{" "}
               <strong className="font-semibold">
-                {formatSignedPercent(summary.cagrPct, 2)}
+                ({formatSignedPercent(summary.cagrPct, 2)} CAGR)
               </strong>{" "}
-              with{" "}
+              and in-sample{" "}
               <strong className="font-semibold">
-                {formatSignedPercent(summary.maxDrawdownPct, 2)} max drawdown
-              </strong>{" "}
-              — worse risk than the Donchian book (−21.3%). This is not a clean
-              20% claim.
+                ({formatSignedPercent(validation.inSampleCagrPct, 2)} to
+                end-2023)
+              </strong>
+              — the first four-market book here that does both. That is still
+              not a guarantee.
             </li>
             <li>
-              Win rate is{" "}
+              Max drawdown is{" "}
               <strong className="font-semibold">
-                {formatPercent(summary.winRatePct, 1)}
+                {formatSignedPercent(summary.maxDrawdownPct, 2)}
               </strong>{" "}
-              with a fat right tail. Most names stop out; a few multi-month
-              holds carry the result. Profit factor{" "}
-              {formatNumber(summary.profitFactor, 2)} does not mean most trades
-              win.
+              versus Donchian −21%. More livable than TSMOM / dual momentum
+              (−49% to −52%).
             </li>
             <li>
-              In-sample to end-2023 is only{" "}
-              <strong className="font-semibold">
-                {formatSignedPercent(validation.inSampleCagrPct, 2)} CAGR
-              </strong>{" "}
-              ({formatMoney(validation.inSampleEquity, summary.currency)}),
-              still with roughly{" "}
-              <strong className="font-semibold">−52% drawdown</strong>. A lot
-              of the juice sits in 2024–26 (holdout{" "}
-              {formatSignedPercent(validation.oosResetCagrPct, 2)}).
+              Gold is about{" "}
+              <strong className="font-semibold">62.5% of closed P&amp;L</strong>.
+              2017 was a +115–120% outlier. 2024–25 were fat. 2026 is{" "}
+              <strong className="font-semibold">−11%</strong> year-to-date.
             </li>
             <li>
               These figures are{" "}
@@ -186,7 +198,7 @@ export default async function DualMomentumBacktestPage() {
               This page is archived because full-sample after-costs CAGR is ≥
               15%,{" "}
               <strong className="font-semibold">
-                not because dual momentum is preferred over Donchian
+                not because vol-target is preferred over Donchian on risk
               </strong>
               .
             </li>
@@ -197,7 +209,7 @@ export default async function DualMomentumBacktestPage() {
           <ResearchArchive
             rule={archive.rule}
             books={archive.books}
-            currentHref="/backtesting/dual-momentum"
+            currentHref="/backtesting/vol-target"
           />
         </div>
 
@@ -207,7 +219,7 @@ export default async function DualMomentumBacktestPage() {
         >
           <StatCard
             label="Ending equity"
-            value={formatMoney(summary.endingEquity, summary.currency)}
+            value={formatMoneyWhole(summary.endingEquity, summary.currency)}
             caption={`From ${formatMoneyWhole(summary.startingEquity, summary.currency)} · ${summary.periodLabel} · ${summary.vendor}`}
           />
           <StatCard
@@ -218,7 +230,7 @@ export default async function DualMomentumBacktestPage() {
           <StatCard
             label="Max drawdown"
             value={formatSignedPercent(summary.maxDrawdownPct, 2)}
-            caption="Peak to trough · worse than Donchian · intra-year"
+            caption="Peak to trough · 13 March 2020 · worse than Donchian"
             tone="negative"
           />
           <StatCard
@@ -233,7 +245,7 @@ export default async function DualMomentumBacktestPage() {
           />
           <StatCard
             label="Win rate"
-            value={formatPercent(summary.winRatePct, 2)}
+            value={formatPercent(summary.winRatePct, 1)}
             caption="Low hit rate · fat right tail"
           />
           <StatCard
@@ -243,7 +255,7 @@ export default async function DualMomentumBacktestPage() {
           />
           <StatCard
             label="Net P&L"
-            value={formatMoney(summary.netPnl, summary.currency)}
+            value={formatMoneyWhole(summary.netPnl, summary.currency)}
             caption={`${formatMoneyWhole(summary.startingEquity, summary.currency)} starting equity`}
           />
         </section>
@@ -255,12 +267,7 @@ export default async function DualMomentumBacktestPage() {
           <StatCard
             label="In-sample CAGR"
             value={formatSignedPercent(validation.inSampleCagrPct, 2)}
-            caption={`To ${validation.inSampleTo} · ${formatMoney(validation.inSampleEquity, summary.currency)} · still −52% DD`}
-          />
-          <StatCard
-            label="Holdout CAGR"
-            value={formatSignedPercent(validation.oosResetCagrPct, 2)}
-            caption={`${validation.oosResetPeriod} OOS window`}
+            caption={`To ${validation.inSampleTo} · ${formatMoneyWhole(validation.inSampleEquity, summary.currency)} · still ${formatSignedPercent(validation.inSampleMaxDrawdownPct, 2)} DD`}
           />
           <StatCard
             label="Walk-forward OOS"
@@ -268,14 +275,19 @@ export default async function DualMomentumBacktestPage() {
             caption={`Concatenated OOS · DD ${formatSignedPercent(validation.walkForwardOosMaxDrawdownPct, 1)}`}
           />
           <StatCard
-            label="Cash months"
-            value={`${validation.cashMonths} / ${validation.totalMonths}`}
-            caption={validation.cashMonthsNote}
-          />
-          <StatCard
             label="Spread stress CAGR"
             value={formatSignedPercent(validation.spreadStressCagrPct, 2)}
             caption={validation.spreadStress}
+          />
+          <StatCard
+            label="2024–26 pound share"
+            value={formatPercent(validation.poundsShare2024To2026Pct, 1)}
+            caption="Share of net pounds after the in-sample cut (compounding on a larger base)"
+          />
+          <StatCard
+            label="Max open"
+            value={formatNumber(validation.maxOpenPositions, 0)}
+            caption="Cap when more than three names are eligible · lowest H4 ATR%"
           />
           <StatCard
             label="Costs"
@@ -290,6 +302,7 @@ export default async function DualMomentumBacktestPage() {
             annotations={equity.annotations}
             caption={chartCaption}
             badge={chartBadge}
+            emptyLabel="Daily series pending"
           />
         </div>
 
@@ -298,16 +311,18 @@ export default async function DualMomentumBacktestPage() {
             Per-market contribution
           </h2>
           <p className="mt-2 max-w-2xl text-sm text-ink-muted">
-            Locked closed P&amp;L across {formatMoney(markets.netPnl, summary.currency)}.
-            Gold and Nasdaq made the book; Dow and DAX lost money. Shares of
-            closed P&amp;L therefore sum through more than 100% on the winners.
-            Months selected can overlap because the book holds the top two
-            eligible names.
+            Locked closed P&amp;L where we have it, across{" "}
+            {formatMoneyWhole(markets.netPnl, summary.currency)}. Gold made
+            about 62.5%; Dow was selected often and paid about £50. Nasdaq and
+            DAX complete the four-name sleeve — their closed P&amp;L is not
+            broken out yet. Months selected can overlap because the book holds
+            up to three eligible names.
           </p>
 
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             {markets.markets.map((market) => {
               const negative = (market.pnl ?? 0) < 0;
+              const unknown = market.pnl == null;
               return (
                 <article
                   key={market.id}
@@ -321,13 +336,21 @@ export default async function DualMomentumBacktestPage() {
                   </h3>
                   <p
                     className={`mt-3 text-[1.75rem] leading-none font-semibold tracking-tight tabular-nums ${
-                      negative ? "text-negative" : "text-ink"
+                      unknown
+                        ? "text-ink-muted"
+                        : negative
+                          ? "text-negative"
+                          : "text-ink"
                     }`}
                   >
-                    {formatMoney(market.pnl, summary.currency)}
+                    {unknown
+                      ? "Not locked"
+                      : formatMoneyWhole(market.pnl, summary.currency)}
                   </p>
                   <p className="mt-3 text-sm text-ink-muted">
-                    {formatSignedPercent(market.sharePct, 1)} of closed P&amp;L.
+                    {market.sharePct != null
+                      ? `${formatSignedPercent(market.sharePct, 1)} of closed P&L.`
+                      : "Share of closed P&L not locked."}
                     {market.trades != null ? ` ${market.trades} trades.` : ""}
                     {market.monthsSelected != null
                       ? ` Selected in ${market.monthsSelected} months.`
@@ -352,7 +375,6 @@ export default async function DualMomentumBacktestPage() {
                     <th className="px-5 py-3 font-medium">Market</th>
                     <th className="px-5 py-3 font-medium">Broker symbol</th>
                     <th className="px-5 py-3 font-medium">P&amp;L</th>
-                    <th className="px-5 py-3 font-medium">Trades</th>
                     <th className="px-5 py-3 font-medium">Months</th>
                     <th className="px-5 py-3 font-medium">Share</th>
                   </tr>
@@ -360,6 +382,7 @@ export default async function DualMomentumBacktestPage() {
                 <tbody>
                   {markets.markets.map((market) => {
                     const negative = (market.pnl ?? 0) < 0;
+                    const unknown = market.pnl == null;
                     return (
                       <tr key={market.id} className="border-t border-border">
                         <td className="px-5 py-3 text-ink">{market.label}</td>
@@ -368,25 +391,34 @@ export default async function DualMomentumBacktestPage() {
                         </td>
                         <td
                           className={`px-5 py-3 tabular-nums ${
-                            negative
-                              ? "bg-negative-soft text-negative"
-                              : "bg-positive-soft text-positive"
+                            unknown
+                              ? "text-ink-muted"
+                              : negative
+                                ? "bg-negative-soft text-negative"
+                                : "bg-positive-soft text-positive"
                           }`}
                         >
-                          {formatMoney(market.pnl, summary.currency)}
+                          {unknown
+                            ? "—"
+                            : formatMoneyWhole(market.pnl, summary.currency)}
                         </td>
                         <td className="px-5 py-3 tabular-nums">
-                          {formatNumber(market.trades, 0)}
-                        </td>
-                        <td className="px-5 py-3 tabular-nums">
-                          {formatNumber(market.monthsSelected, 0)}
+                          {market.monthsSelected == null
+                            ? "—"
+                            : formatNumber(market.monthsSelected, 0)}
                         </td>
                         <td
                           className={`px-5 py-3 tabular-nums ${
-                            negative ? "text-negative" : "text-ink"
+                            unknown
+                              ? "text-ink-muted"
+                              : negative
+                                ? "text-negative"
+                                : "text-ink"
                           }`}
                         >
-                          {formatSignedPercent(market.sharePct, 1)}
+                          {market.sharePct == null
+                            ? "—"
+                            : formatSignedPercent(market.sharePct, 1)}
                         </td>
                       </tr>
                     );
@@ -400,78 +432,99 @@ export default async function DualMomentumBacktestPage() {
 
         <section className="mt-10">
           <h2 className="text-xl font-semibold text-ink">Yearly returns</h2>
-          <p className="mt-2 max-w-2xl text-sm text-ink-muted">
-            Locked year-end equity from the research book. 2016 is the 12-month
-            lookback warmup (cash). 2017 is the large in-sample year; 2018 gives
-            a lot of it back. 2023 is almost flat. 2024–25 hold most of the
-            remaining gain. The{" "}
-            <strong className="font-semibold text-ink">
-              {formatSignedPercent(summary.maxDrawdownPct, 2)} max drawdown
-            </strong>{" "}
-            is intra-year and does not appear as a year-end print. 2026 is
-            partial to 28 August.
-          </p>
-          <div className="mt-4 overflow-hidden rounded-lg border border-border bg-surface shadow-card">
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-left text-sm">
-                <thead className="bg-bg text-xs tracking-wide text-ink-muted uppercase">
-                  <tr>
-                    <th className="px-5 py-3 font-medium">Year</th>
-                    <th className="px-5 py-3 font-medium">Start</th>
-                    <th className="px-5 py-3 font-medium">End</th>
-                    <th className="px-5 py-3 font-medium">P&amp;L</th>
-                    <th className="px-5 py-3 font-medium">Return</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {years.years.map((row) => {
-                    const negative = row.netPnl < 0;
-                    const flat = row.netPnl === 0;
-                    return (
-                      <tr key={row.year} className="border-t border-border">
-                        <td className="px-5 py-3 text-ink">
-                          {row.year}
-                          {row.partial ? (
-                            <span className="ml-2 text-xs text-ink-muted">
-                              YTD
-                            </span>
-                          ) : null}
-                        </td>
-                        <td className="px-5 py-3 tabular-nums text-ink-muted">
-                          {formatMoney(row.startEquity, summary.currency)}
-                        </td>
-                        <td className="px-5 py-3 tabular-nums">
-                          {formatMoney(row.endEquity, summary.currency)}
-                        </td>
-                        <td
-                          className={`px-5 py-3 tabular-nums ${
-                            negative
-                              ? "bg-negative-soft text-negative"
-                              : flat
-                                ? "text-ink-muted"
-                                : "bg-positive-soft text-positive"
-                          }`}
-                        >
-                          {formatMoney(row.netPnl, summary.currency)}
-                        </td>
-                        <td
-                          className={`px-5 py-3 tabular-nums ${
-                            negative
-                              ? "text-negative"
-                              : flat
-                                ? "text-ink-muted"
-                                : "text-positive"
-                          }`}
-                        >
-                          {formatSignedPercent(row.returnPct)}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+          {years.years.length === 0 ? (
+            <div className="mt-4 rounded-lg border border-border bg-surface px-5 py-5 shadow-card">
+              <p className="text-sm leading-6 text-ink-muted">
+                {years.note} Locked splits we do have: in-sample to{" "}
+                {validation.inSampleTo} at{" "}
+                <strong className="font-semibold text-ink">
+                  {formatSignedPercent(validation.inSampleCagrPct, 2)} CAGR
+                </strong>{" "}
+                (
+                {formatMoneyWhole(validation.inSampleEquity, summary.currency)}
+                ). Walk-forward OOS concat{" "}
+                {formatSignedPercent(validation.walkForwardOosCagrPct, 2)} with{" "}
+                {formatSignedPercent(
+                  validation.walkForwardOosMaxDrawdownPct,
+                  1,
+                )}{" "}
+                drawdown.
+              </p>
             </div>
-          </div>
+          ) : (
+            <>
+              <p className="mt-2 max-w-2xl text-sm text-ink-muted">
+                {years.note} The{" "}
+                <strong className="font-semibold text-ink">
+                  {formatSignedPercent(summary.maxDrawdownPct, 2)} max
+                  drawdown
+                </strong>{" "}
+                is intra-year (13 March 2020) and does not appear as a year-end
+                print.
+              </p>
+              <div className="mt-4 overflow-hidden rounded-lg border border-border bg-surface shadow-card">
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-left text-sm">
+                    <thead className="bg-bg text-xs tracking-wide text-ink-muted uppercase">
+                      <tr>
+                        <th className="px-5 py-3 font-medium">Year</th>
+                        <th className="px-5 py-3 font-medium">Start</th>
+                        <th className="px-5 py-3 font-medium">End</th>
+                        <th className="px-5 py-3 font-medium">P&amp;L</th>
+                        <th className="px-5 py-3 font-medium">Return</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {years.years.map((row) => {
+                        const negative = row.netPnl < 0;
+                        const flat = row.netPnl === 0;
+                        return (
+                          <tr key={row.year} className="border-t border-border">
+                            <td className="px-5 py-3 text-ink">
+                              {row.year}
+                              {row.partial ? (
+                                <span className="ml-2 text-xs text-ink-muted">
+                                  YTD
+                                </span>
+                              ) : null}
+                            </td>
+                            <td className="px-5 py-3 tabular-nums text-ink-muted">
+                              {formatMoney(row.startEquity, summary.currency)}
+                            </td>
+                            <td className="px-5 py-3 tabular-nums">
+                              {formatMoney(row.endEquity, summary.currency)}
+                            </td>
+                            <td
+                              className={`px-5 py-3 tabular-nums ${
+                                negative
+                                  ? "bg-negative-soft text-negative"
+                                  : flat
+                                    ? "text-ink-muted"
+                                    : "bg-positive-soft text-positive"
+                              }`}
+                            >
+                              {formatMoney(row.netPnl, summary.currency)}
+                            </td>
+                            <td
+                              className={`px-5 py-3 tabular-nums ${
+                                negative
+                                  ? "text-negative"
+                                  : flat
+                                    ? "text-ink-muted"
+                                    : "text-positive"
+                              }`}
+                            >
+                              {formatSignedPercent(row.returnPct)}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
+          )}
         </section>
 
         <section className="mt-10">
@@ -485,12 +538,19 @@ export default async function DualMomentumBacktestPage() {
             >
               Backtesting
             </Link>
-            , not the vol-target SMA200 filter on{" "}
+            , not the dual-momentum rank on{" "}
             <Link
-              href="/backtesting/vol-target"
+              href="/backtesting/dual-momentum"
               className="font-medium text-accent hover:text-accent-hover"
             >
-              Vol-target
+              Dual momentum
+            </Link>
+            , not the 12–1 TSMOM filter on{" "}
+            <Link
+              href="/backtesting/tsmom"
+              className="font-medium text-accent hover:text-accent-hover"
+            >
+              TSMOM
             </Link>
             , and not the opening-range day-trading method on{" "}
             <Link
@@ -502,7 +562,7 @@ export default async function DualMomentumBacktestPage() {
             .
           </p>
           <dl className="mt-4 grid gap-4 md:grid-cols-2">
-            {DUAL_MOMENTUM_RULES.map((rule) => (
+            {VOL_TARGET_RULES.map((rule) => (
               <div
                 key={rule.title}
                 className="rounded-lg border border-border bg-surface p-5 shadow-card"
@@ -523,8 +583,8 @@ export default async function DualMomentumBacktestPage() {
             fullTradeCount={trades.fullTradeCount}
             note={trades.note}
             howToReplace={trades.howToReplace}
-            marketFilters={DUAL_MOMENTUM_MARKET_FILTERS}
-            dataFile="public/data/backtesting/dual-momentum/trades.json"
+            marketFilters={VOL_TARGET_MARKET_FILTERS}
+            dataFile="public/data/backtesting/vol-target/trades.json"
           />
         </div>
 
