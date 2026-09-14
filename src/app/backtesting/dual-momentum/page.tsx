@@ -10,7 +10,7 @@ import {
   DUAL_MOMENTUM_MARKET_FILTERS,
   DUAL_MOMENTUM_RULES,
 } from "@/lib/backtesting-archive";
-import { downsampleEquity } from "@/lib/backtesting";
+import { downsampleEquity, sourceHowToReplace } from "@/lib/backtesting";
 import {
   loadBacktestArchive,
   loadBacktestMarkets,
@@ -50,7 +50,7 @@ export default async function DualMomentumBacktestPage() {
     equity.annotations.map((item) => item.date),
   );
   const seriesKind = equity.kind ?? equity.source?.type;
-  const howToReplace = equity.source?.howToReplace ?? "";
+  const howToReplace = sourceHowToReplace(equity.source);
   const weekdayCount = new Intl.NumberFormat("en-GB").format(
     equity.points.length,
   );
