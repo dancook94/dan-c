@@ -32,10 +32,10 @@ export type EquityCurvePayload = {
   startDate: string;
   endDate: string;
   headlineCagrPct: number;
-  reconstructedCagrPct: number;
+  reconstructedCagrPct: number | null;
   inSampleTo: string;
   inSampleCagrPct: number | null;
-  maxDrawdownPct: number;
+  maxDrawdownPct: number | null;
   headlineMaxDrawdownPct: number;
   source: {
     type: string;
@@ -119,6 +119,8 @@ export type BacktestValidation = {
   cashMonths: number;
   totalMonths: number;
   cashMonthsNote: string;
+  poundsShare2024To2026Pct?: number;
+  maxOpenPositions?: number;
 };
 
 export type SummaryPayload = {

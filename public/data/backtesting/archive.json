@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "rule": "Publish a dedicated Backtesting page for every locked book whose full-sample after-costs CAGR is ≥ 15%.",
   "thresholdCagrPct": 15,
-  "note": "Archived because the locked full-sample CAGR clears 15%, not because a book is preferred. Dual momentum is not a substitute for the H4 Donchian page.",
+  "note": "Archived because the locked full-sample CAGR clears 15%, not because a book is preferred. Dual momentum and 12–1 TSMOM are not substitutes for the H4 Donchian page on risk.",
   "howToReplace": "Add a book object here when a new locked research book clears the 15% CAGR archive rule, and add a matching route under /backtesting/{slug} with JSON in public/data/backtesting/{slug}/.",
   "books": [
     {
@@ -22,6 +22,15 @@
       "maxDrawdownPct": -52.18,
       "periodLabel": "Jan 2016 – Aug 2026",
       "dataDir": "public/data/backtesting/dual-momentum"
+    },
+    {
+      "slug": "tsmom",
+      "href": "/backtesting/tsmom",
+      "title": "Four-market 12–1 month TSMOM",
+      "cagrPct": 26.2,
+      "maxDrawdownPct": -49.3,
+      "periodLabel": "Jan 2016 – Aug 2026",
+      "dataDir": "public/data/backtesting/tsmom"
     }
   ]
 }

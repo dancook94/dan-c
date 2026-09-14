@@ -24,7 +24,7 @@ export function ResearchArchive({
         Research archive (≥{BACKTEST_ARCHIVE_THRESHOLD_CAGR_PCT}% CAGR)
       </p>
       <p className="mt-2 max-w-3xl text-sm leading-6 text-ink-muted">{rule}</p>
-      <ul className="mt-4 grid gap-3 md:grid-cols-2">
+      <ul className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {books.map((book) => {
           const current = book.href === currentHref;
           const className = current
