@@ -79,8 +79,8 @@ export type BacktestMarket = {
   id: string;
   label: string;
   broker: string;
-  sharePct: number;
-  pnl: number;
+  sharePct: number | null;
+  pnl: number | null;
   note: string;
   trades?: number;
   monthsSelected?: number;

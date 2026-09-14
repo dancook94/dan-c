@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "slug": "vol-target",
+  "currency": "GBP",
+  "netPnl": 65490,
+  "note": "Gold is about 62.5% of closed P&L; Dow paid about £50 despite being selected in about 92 of 128 months. Nasdaq and DAX complete the sleeve — their closed P&L is not locked here. Months selected can overlap because the book holds up to three eligible names.",
+  "howToReplace": "Overwrite public/data/backtesting/vol-target/markets.json. Keep schemaVersion: 1 and markets[] with id, label, broker, pnl, sharePct, note. Optional: trades, monthsSelected. pnl/sharePct may be null until a name is broken out.",
+  "markets": [
+    {
+      "id": "XAUUSD",
+      "label": "Gold",
+      "broker": "XAUUSD",
+      "pnl": 40931,
+      "sharePct": 62.5,
+      "note": "About 62.5% of closed P&L — the four-market story is not a balanced sleeve."
+    },
+    {
+      "id": "US30",
+      "label": "US 30",
+      "broker": "US30 / USA30",
+      "pnl": 50,
+      "sharePct": 0.08,
+      "monthsSelected": 92,
+      "note": "Selected often (about 92 of 128 months) and paid about £50. Tie-break first when H4 ATR% ties."
+    },
+    {
+      "id": "NAS100",
+      "label": "US Tech 100",
+      "broker": "NAS100 / USATECH",
+      "pnl": null,
+      "sharePct": null,
+      "note": "In the four-name universe. Closed P&L is not broken out in this locked summary. Tie-break second."
+    },
+    {
+      "id": "DE40",
+      "label": "Germany 40",
+      "broker": "DE40 / DEU40",
+      "pnl": null,
+      "sharePct": null,
+      "note": "In the four-name universe. Closed P&L is not broken out in this locked summary. Tie-break last."
+    }
+  ]
+}

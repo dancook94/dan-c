@@ -20,6 +20,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | `/backtesting` | Hypothetical H4 Donchian multi-market research deep-dive |
 | `/backtesting/dual-momentum` | Hypothetical four-market dual momentum research deep-dive |
 | `/backtesting/tsmom` | Hypothetical four-market 12–1 month TSMOM research deep-dive |
+| `/backtesting/vol-target` | Hypothetical four-market vol-target SMA200 research deep-dive |
 | `/method` | Opening-range breakout v1 in plain English |
 | `/course` | “Build a trading robot” waitlist |
 | `/about` | Who / UK / full risk disclosure |
@@ -93,14 +94,16 @@ Archive rule: **publish a dedicated Backtesting page for every locked book whose
 
 `/backtesting/tsmom` reads `public/data/backtesting/tsmom/` with the same five files. `equity_curve.json` is scaffolded as `kind: research_daily` (three locked checkpoints) so a weekday dump can drop in. `years.json` stays empty until that dump. Sample trades are prefixed `SAMPLE-TS-`.
 
-Headline KPIs (CAGR, max DD, trade count, profit factor, per-market P&L) are the approved research summary. Dual-momentum `equity_curve.json` interpolates locked year-end equity — it is **not** a raw Dukascopy daily export, and the −52.18% max drawdown is intra-year so it does not appear on that line. Sample trades are prefixed `SAMPLE-` / `SAMPLE-DM-` / `SAMPLE-TS-` and set `"sample": true`.
+`/backtesting/vol-target` reads `public/data/backtesting/vol-target/` with the same five files. `equity_curve.json` keeps `kind: research_daily` so a weekday dump can drop in; until then `source.type` is `checkpoint_interpolated` and `source.howToReplace` is always set. Locked checkpoints: start £5,000, in-sample £24,184 at end-2023, 13 March 2020 trough −30.33%, end £70,490. Sample trades are prefixed `SAMPLE-VT-`.
+
+Headline KPIs (CAGR, max DD, trade count, profit factor, per-market P&L) are the approved research summary. Dual-momentum `equity_curve.json` interpolates locked year-end equity — it is **not** a raw Dukascopy daily export, and the −52.18% max drawdown is intra-year so it does not appear on that line. Sample trades are prefixed `SAMPLE-` / `SAMPLE-DM-` / `SAMPLE-TS-` / `SAMPLE-VT-` and set `"sample": true`.
 
 To replace later:
 
 1. Overwrite `equity_curve.json` with a research dump that keeps `points[].date` (`YYYY-MM-DD`) and `points[].equity`. Optional: `points[].drawdownPct`, `annotations[]`, `yearlyReturns[]`. For TSMOM keep `kind: research_daily` and add a `max_drawdown` annotation when the trough date is known.
 2. Overwrite `trades.json` with the full book. Set `"sample": false`. Required trade fields: `id`, `market`, `openedAt`, `closedAt`, `side`, `pnl`. Optional: `symbol`, `entry`, `exit`, `rMultiple`, `notes`.
-3. For dual momentum and TSMOM, also overwrite `summary.json`, `markets.json`, and `years.json` in that folder. Loaders already read by slug under `public/data/backtesting/{slug}/`.
-4. Regenerate a placeholder path with `node scripts/generate-backtesting-data.mjs`, `node scripts/generate-dual-momentum-data.mjs`, or `node scripts/generate-tsmom-data.mjs` only if you still need the scaffold.
+3. For dual momentum, TSMOM, and vol-target, also overwrite `summary.json`, `markets.json`, and `years.json` in that folder. Loaders already read by slug under `public/data/backtesting/{slug}/`.
+4. Regenerate a placeholder path with `node scripts/generate-backtesting-data.mjs`, `node scripts/generate-dual-momentum-data.mjs`, `node scripts/generate-tsmom-data.mjs`, or `node scripts/generate-vol-target-data.mjs` only if you still need the scaffold.
 
 Never present these pages as live trading.
 

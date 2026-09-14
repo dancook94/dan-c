@@ -64,3 +64,34 @@ export const TSMOM_MARKET_FILTERS = [
   "US30",
   "DE40",
 ] as const;
+
+export const VOL_TARGET_RULES = [
+  {
+    title: "Lagged SMA200 filter",
+    body: "Long only when the prior UTC daily close is above the prior 200-day SMA (lagged). No short book. If the close is below that lagged average, the name is not eligible.",
+  },
+  {
+    title: "Rebalance",
+    body: "Monthly rebalance on the first H4 open of the new month. This is not an H4 Donchian channel system, not a 12–1 rank, and it is not the London day-trading book.",
+  },
+  {
+    title: "Holdings when more than three qualify",
+    body: "At most three names are open. If more than three markets are eligible, prefer the lowest current H4 ATR%. Tie-break order: USA30, USATECH, XAUUSD, DEU40.",
+  },
+  {
+    title: "Risk and exits",
+    body: "1% of equity risked to a hard 2×H4 ATR stop. Flatten on that stop or on month-end demotion only. No Chandelier trail. No Donchian channel exit. No 12–1 momentum rank.",
+  },
+  {
+    title: "Costs",
+    body: "Same research costs as the multi-market H4 Donchian, dual-momentum, and 12–1 TSMOM books (Dukascopy history, after costs).",
+  },
+] as const;
+
+export const VOL_TARGET_MARKET_FILTERS = [
+  "All",
+  "XAUUSD",
+  "NAS100",
+  "US30",
+  "DE40",
+] as const;

@@ -97,6 +97,13 @@ export default async function TsmomBacktestPage() {
           >
             dual-momentum
           </Link>{" "}
+          book, not the{" "}
+          <Link
+            href="/backtesting/vol-target"
+            className="font-medium text-accent hover:text-accent-hover"
+          >
+            vol-target SMA200
+          </Link>{" "}
           book, not the live forex day-trading book on{" "}
           <Link
             href="/results"
@@ -120,15 +127,16 @@ export default async function TsmomBacktestPage() {
           </p>
           <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-ink">
             <li>
-              Highest full-sample CAGR of the three archived books (
+              Full-sample CAGR{" "}
               <strong className="font-semibold">
                 {formatSignedPercent(summary.cagrPct, 2)}
-              </strong>
-              ) but{" "}
+              </strong>{" "}
+              with{" "}
               <strong className="font-semibold">
                 {formatSignedPercent(summary.maxDrawdownPct, 1)} max drawdown
               </strong>
-              . Donchian (−21.3%) is far more livable.
+              . The vol-target SMA200 book now prints a higher CAGR with a
+              smaller drawdown. Donchian (−21.3%) is still the most livable.
             </li>
             <li>
               In-sample to end-2023 is only{" "}
@@ -290,7 +298,7 @@ export default async function TsmomBacktestPage() {
 
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             {markets.markets.map((market) => {
-              const negative = market.pnl < 0;
+              const negative = (market.pnl ?? 0) < 0;
               return (
                 <article
                   key={market.id}
@@ -341,7 +349,7 @@ export default async function TsmomBacktestPage() {
                 </thead>
                 <tbody>
                   {markets.markets.map((market) => {
-                    const negative = market.pnl < 0;
+                    const negative = (market.pnl ?? 0) < 0;
                     return (
                       <tr key={market.id} className="border-t border-border">
                         <td className="px-5 py-3 text-ink">{market.label}</td>
@@ -496,6 +504,13 @@ export default async function TsmomBacktestPage() {
               className="font-medium text-accent hover:text-accent-hover"
             >
               Dual momentum
+            </Link>
+            , not the vol-target SMA200 filter on{" "}
+            <Link
+              href="/backtesting/vol-target"
+              className="font-medium text-accent hover:text-accent-hover"
+            >
+              Vol-target
             </Link>
             , and not the opening-range day-trading method on{" "}
             <Link

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "kind": "locked_partial_only",
+  "currency": "GBP",
+  "note": "Only 2026 is a locked calendar print (−11% YTD to 28 August). 2017 was a +115–120% outlier (range, not a year-end print). 2024–25 were fat. Other year-ends wait for the daily dump.",
+  "howToReplace": "Overwrite public/data/backtesting/vol-target/years.json with locked year-end rows. Keep schemaVersion: 1 and years[] with year, startEquity, endEquity, netPnl, returnPct. Optional: partial, asOf. Set kind to locked_year_end.",
+  "years": [
+    {
+      "year": 2026,
+      "startEquity": 79202.25,
+      "endEquity": 70490,
+      "netPnl": -8712.25,
+      "returnPct": -11,
+      "partial": true,
+      "asOf": "2026-08-28"
+    }
+  ]
+}
