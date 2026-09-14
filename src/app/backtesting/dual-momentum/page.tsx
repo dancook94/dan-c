@@ -49,7 +49,44 @@ export default async function DualMomentumBacktestPage() {
     equity.points,
     equity.annotations.map((item) => item.date),
   );
-  const chartCaption = `${equity.source.label} Series runs from ${equity.startDate} to ${equity.endDate} (${new Intl.NumberFormat("en-GB").format(equity.points.length)} weekdays; chart downsampled for display). Headline statistics are the locked research summary. The line only interpolates published year-end equity — the −52.18% max drawdown is intra-year and is not drawn here. ${equity.source.howToReplace}`;
+  const seriesKind = equity.kind ?? equity.source?.type;
+  const howToReplace = equity.source?.howToReplace ?? "";
+  const weekdayCount = new Intl.NumberFormat("en-GB").format(
+    equity.points.length,
+  );
+  const seriesRange = `Series runs from ${equity.startDate} to ${equity.endDate} (${weekdayCount} weekdays; chart downsampled for display).`;
+  const maxDd = equity.annotations.find((item) => item.type === "max_drawdown");
+  const isDailyResearch =
+    seriesKind === "research_daily" || equity.source?.type === "research_daily";
+  const chartBadge = isDailyResearch
+    ? "Daily research path"
+    : seriesKind === "year_end_interpolated"
+      ? "Year-end interpolation"
+      : "Research equity path";
+  const chartCaption = (
+    isDailyResearch
+      ? [
+          equity.source.label,
+          seriesRange,
+          "These are real daily research points from the fxday dual-momentum book, downsampled only for display — not year-end interpolation.",
+          maxDd
+            ? `The ${maxDd.label} trough on ${maxDd.date} is marked on the chart.`
+            : "Max drawdown is marked on the chart when present in the series.",
+          "Headline statistics are the locked research summary.",
+          howToReplace,
+        ]
+      : [
+          equity.source.label,
+          seriesRange,
+          "Headline statistics are the locked research summary.",
+          seriesKind === "year_end_interpolated"
+            ? "The line only interpolates published year-end equity — the intra-year max drawdown is not drawn here."
+            : "",
+          howToReplace,
+        ]
+  )
+    .filter(Boolean)
+    .join(" ");
   const { validation } = summary;
 
   return (
@@ -238,7 +275,7 @@ export default async function DualMomentumBacktestPage() {
             points={chartPoints}
             annotations={equity.annotations}
             caption={chartCaption}
-            badge="Year-end interpolation"
+            badge={chartBadge}
           />
         </div>
 
