@@ -11,6 +11,7 @@ import {
   BACKTEST_RULES,
   BACKTEST_SUMMARY,
   downsampleEquity,
+  sourceHowToReplace,
 } from "@/lib/backtesting";
 import {
   loadBacktestArchive,
@@ -43,7 +44,14 @@ export default async function BacktestingPage() {
     equity.points,
     equity.annotations.map((item) => item.date),
   );
-  const chartCaption = `${equity.source.label} Series runs from ${equity.startDate} to ${equity.endDate} (${new Intl.NumberFormat("en-GB").format(equity.points.length)} weekdays; chart downsampled for display). Headline statistics are the research summary; the line is a smooth reconstruction that hits those checkpoints, including the mid-sample drawdown. ${equity.source.howToReplace}`;
+  const chartCaption = [
+    equity.source.label,
+    `Series runs from ${equity.startDate} to ${equity.endDate} (${new Intl.NumberFormat("en-GB").format(equity.points.length)} weekdays; chart downsampled for display).`,
+    "Headline statistics are the research summary; the line is a smooth reconstruction that hits those checkpoints, including the mid-sample drawdown.",
+    sourceHowToReplace(equity.source),
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div className="pb-16">

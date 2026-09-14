@@ -255,6 +255,13 @@ export const MARKET_FILTERS = [
 
 export type MarketFilter = (typeof MARKET_FILTERS)[number];
 
+/** Caption note for replacing JSON dumps; empty when the daily export omits it. */
+export function sourceHowToReplace(
+  source?: { howToReplace?: string } | null,
+): string {
+  return source?.howToReplace ?? "";
+}
+
 export function equityAtDate(
   points: EquityPoint[],
   date: string,

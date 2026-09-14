@@ -7,7 +7,7 @@ import { Disclaimer, PerformanceNote } from "@/components/disclaimer";
 import { ResearchArchive } from "@/components/research-archive";
 import { StatCard } from "@/components/stat-card";
 import { TSMOM_MARKET_FILTERS, TSMOM_RULES } from "@/lib/backtesting-archive";
-import { downsampleEquity } from "@/lib/backtesting";
+import { downsampleEquity, sourceHowToReplace } from "@/lib/backtesting";
 import {
   loadBacktestArchive,
   loadBacktestMarkets,
@@ -48,9 +48,24 @@ export default async function TsmomBacktestPage() {
   );
   const pendingDaily =
     equity.source.type === "scaffold" || equity.points.length < 50;
-  const chartCaption = pendingDaily
-    ? `${equity.source.label} Locked headlines are on this page. The line is a ${equity.points.length}-point checkpoint scaffold (start, implied end-2023, August 2026) until the research daily dump lands. Headline max drawdown ${formatSignedPercent(summary.maxDrawdownPct, 1)} is intra-year and is not drawn here. ${equity.source.howToReplace}`
-    : `${equity.source.label} Series runs from ${equity.startDate} to ${equity.endDate} (${new Intl.NumberFormat("en-GB").format(equity.points.length)} weekdays; chart downsampled for display). Headline statistics are the locked research summary. ${equity.source.howToReplace}`;
+  const howToReplace = sourceHowToReplace(equity.source);
+  const chartCaption = (
+    pendingDaily
+      ? [
+          equity.source.label,
+          `Locked headlines are on this page. The line is a ${equity.points.length}-point checkpoint scaffold (start, implied end-2023, August 2026) until the research daily dump lands.`,
+          `Headline max drawdown ${formatSignedPercent(summary.maxDrawdownPct, 1)} is intra-year and is not drawn here.`,
+          howToReplace,
+        ]
+      : [
+          equity.source.label,
+          `Series runs from ${equity.startDate} to ${equity.endDate} (${new Intl.NumberFormat("en-GB").format(equity.points.length)} weekdays; chart downsampled for display).`,
+          "Headline statistics are the locked research summary.",
+          howToReplace,
+        ]
+  )
+    .filter(Boolean)
+    .join(" ");
   const { validation } = summary;
   const chartBadge = pendingDaily
     ? "Daily dump pending"
