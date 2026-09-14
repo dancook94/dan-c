@@ -29,6 +29,9 @@ export function SiteFooter() {
             >
               Dual momentum
             </Link>
+            <Link href="/backtesting/tsmom" className="text-ink-muted hover:text-ink">
+              TSMOM
+            </Link>
             <Link href="/method" className="text-ink-muted hover:text-ink">
               Method
             </Link>

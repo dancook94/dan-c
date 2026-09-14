@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "slug": "tsmom",
+  "currency": "GBP",
+  "netPnl": 54765,
+  "note": "Approximate closed P&L by market (sums to £54,765; account equity finished £59,771). Gold is about 49.5% of that sleeve. Months selected can overlap because the book holds up to three eligible names.",
+  "howToReplace": "Overwrite public/data/backtesting/tsmom/markets.json. Keep schemaVersion: 1 and markets[] with id, label, broker, pnl, sharePct, note. Optional: trades, monthsSelected.",
+  "markets": [
+    {
+      "id": "XAUUSD",
+      "label": "Gold",
+      "broker": "XAUUSD",
+      "pnl": 27127,
+      "monthsSelected": 66,
+      "note": "About half of closed P&L — same gold-heavy outcome as the other archive books, different rules.",
+      "sharePct": 49.53
+    },
+    {
+      "id": "NAS100",
+      "label": "US Tech 100",
+      "broker": "NAS100 / USATECH",
+      "pnl": 15875,
+      "monthsSelected": 100,
+      "note": "Selected in the most months (100). Second-largest sleeve.",
+      "sharePct": 28.99
+    },
+    {
+      "id": "US30",
+      "label": "US 30",
+      "broker": "US30 / USA30",
+      "pnl": 10758,
+      "monthsSelected": 69,
+      "note": "Third sleeve. Tie-break first when 12–1 scores are equal.",
+      "sharePct": 19.64
+    },
+    {
+      "id": "DE40",
+      "label": "Germany 40",
+      "broker": "DE40 / DEU40",
+      "pnl": 1005,
+      "monthsSelected": 67,
+      "note": "Smallest contributor. Still selected in 67 months.",
+      "sharePct": 1.84
+    }
+  ]
+}

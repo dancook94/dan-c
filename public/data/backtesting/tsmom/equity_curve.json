@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "kind": "research_daily",
+  "currency": "GBP",
+  "startingEquity": 5000,
+  "endingEquity": 59771,
+  "startDate": "2016-01-04",
+  "endDate": "2026-08-28",
+  "headlineCagrPct": 26.2,
+  "reconstructedCagrPct": null,
+  "inSampleTo": "2023-12-29",
+  "inSampleCagrPct": 12.92,
+  "inSampleEquity": 13217.12,
+  "maxDrawdownPct": null,
+  "headlineMaxDrawdownPct": -49.3,
+  "source": {
+    "type": "scaffold",
+    "label": "Research-daily scaffold. Locked headlines only — not a Dukascopy weekday export. Three checkpoints (start, implied end-2023, August 2026). Intra-year path and the −49.3% max drawdown are not on this line.",
+    "inputs": [
+      "Start £5,000 on 4 Jan 2016",
+      "Implied in-sample equity £13,217.12 at end-2023 from locked +12.92% CAGR (eight years; not a locked year-end print)",
+      "End £59,771 on 28 Aug 2026",
+      "Headline CAGR +26.20%",
+      "Headline max drawdown −49.3% (intra-year; date unknown until the daily dump)",
+      "~85% of net pounds in 2024–26"
+    ],
+    "howToReplace": "Overwrite public/data/backtesting/tsmom/equity_curve.json with the research daily dump. Keep schemaVersion: 1 and kind: research_daily. Provide points[].date (YYYY-MM-DD), points[].equity, optional points[].drawdownPct, annotations[] (include type: max_drawdown with the trough date), and yearlyReturns[]."
+  },
+  "annotations": [
+    {
+      "date": "2023-12-29",
+      "type": "in_sample_end",
+      "label": "In-sample end (implied £13,217, +12.92% CAGR)",
+      "value": 12.92
+    }
+  ],
+  "yearlyReturns": [],
+  "points": [
+    {
+      "date": "2016-01-04",
+      "equity": 5000,
+      "drawdownPct": 0
+    },
+    {
+      "date": "2023-12-29",
+      "equity": 13217.12,
+      "drawdownPct": 0
+    },
+    {
+      "date": "2026-08-28",
+      "equity": 59771,
+      "drawdownPct": 0
+    }
+  ]
+}

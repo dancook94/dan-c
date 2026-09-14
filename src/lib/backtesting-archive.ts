@@ -33,3 +33,34 @@ export const DUAL_MOMENTUM_MARKET_FILTERS = [
   "US30",
   "DE40",
 ] as const;
+
+export const TSMOM_RULES = [
+  {
+    title: "Absolute 12–1 filter",
+    body: "Per market, compute the 12–1 month return (twelve-month return, skipping the latest month). The name is eligible long only if that score is greater than zero. This is time-series momentum, not a relative dual-momentum rank of the sleeve.",
+  },
+  {
+    title: "Holdings when more than three qualify",
+    body: "If more than three markets are eligible, take the top three by 12–1 score. Tie-break order: USA30, USATECH, XAUUSD, DEU40. At most three names are open.",
+  },
+  {
+    title: "Rebalance",
+    body: "Monthly rebalance on the first H4 open of the new month. If none qualify, the book sits in cash.",
+  },
+  {
+    title: "Risk and exits",
+    body: "1% of equity risked to a hard 2×H4 ATR stop. Flatten on that stop or on month-end demotion only. No Chandelier trail. No Donchian channel exit.",
+  },
+  {
+    title: "Costs",
+    body: "Same research costs as the multi-market H4 Donchian and dual-momentum books (Dukascopy history, after costs).",
+  },
+] as const;
+
+export const TSMOM_MARKET_FILTERS = [
+  "All",
+  "XAUUSD",
+  "NAS100",
+  "US30",
+  "DE40",
+] as const;

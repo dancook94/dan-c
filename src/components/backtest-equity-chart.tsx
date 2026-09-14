@@ -37,12 +37,15 @@ export function BacktestEquityChart({
   annotations,
   caption,
   badge = "Illustrative reconstruction",
+  emptyLabel = "Daily series pending",
 }: {
   points: EquityPoint[];
   annotations: EquityAnnotation[];
   caption: string;
   badge?: string;
+  emptyLabel?: string;
 }) {
+  const hasPath = points.length >= 2;
   const { yearTicks, maxDd, inSample, maxDdPoint } = useMemo(() => {
     const ticks = points
       .filter(
@@ -77,7 +80,8 @@ export function BacktestEquityChart({
         </p>
       </figcaption>
 
-      <div className="h-[320px] w-full sm:h-[360px]">
+      <div className="relative h-[320px] w-full sm:h-[360px]">
+        {hasPath ? (
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={points}
@@ -165,6 +169,13 @@ export function BacktestEquityChart({
             ) : null}
           </ComposedChart>
         </ResponsiveContainer>
+        ) : (
+          <div className="flex h-full items-center justify-center rounded-md border border-dashed border-border bg-bg">
+            <p className="rounded-pill bg-surface px-3 py-1 text-sm font-medium text-ink-muted">
+              {emptyLabel}
+            </p>
+          </div>
+        )}
       </div>
 
       <p className="mt-4 text-xs leading-5 text-ink-muted">{caption}</p>

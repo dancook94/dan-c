@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "kind": "pending_daily_dump",
+  "currency": "GBP",
+  "note": "Calendar year-end equity is not locked yet. Drop yearlyReturns from the research daily dump here. Until then the page shows only the locked in-sample / 2024–26 splits.",
+  "howToReplace": "Overwrite public/data/backtesting/tsmom/years.json with locked year-end rows. Keep schemaVersion: 1 and years[] with year, startEquity, endEquity, netPnl, returnPct. Optional: partial, asOf. Set kind to locked_year_end.",
+  "years": []
+}
