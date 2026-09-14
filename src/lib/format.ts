@@ -31,6 +31,32 @@ export function formatPercent(
   return formatMetric(value, (n) => `${n.toFixed(digits)}%`);
 }
 
+export function formatSignedPercent(
+  value: number | null | undefined,
+  digits = 1,
+): string {
+  return formatMetric(value, (n) => {
+    const body = `${Math.abs(n).toFixed(digits)}%`;
+    if (n > 0) return `+${body}`;
+    if (n < 0) return `−${body}`;
+    return body;
+  });
+}
+
+export function formatMoneyWhole(
+  value: number | null | undefined,
+  currency: ResultsCurrency = "GBP",
+): string {
+  return formatMetric(value, (n) =>
+    new Intl.NumberFormat("en-GB", {
+      style: "currency",
+      currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(n),
+  );
+}
+
 export function formatNumber(
   value: number | null | undefined,
   digits = 3,

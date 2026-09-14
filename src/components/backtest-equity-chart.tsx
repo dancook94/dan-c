@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { formatMoney, formatPercent } from "@/lib/format";
+import { formatMoney, formatPercent, formatSignedPercent } from "@/lib/format";
 import type { EquityAnnotation, EquityPoint } from "@/lib/backtesting";
 import {
   Area,
@@ -36,10 +36,12 @@ export function BacktestEquityChart({
   points,
   annotations,
   caption,
+  badge = "Illustrative reconstruction",
 }: {
   points: EquityPoint[];
   annotations: EquityAnnotation[];
   caption: string;
+  badge?: string;
 }) {
   const { yearTicks, maxDd, inSample, maxDdPoint } = useMemo(() => {
     const ticks = points
@@ -71,7 +73,7 @@ export function BacktestEquityChart({
           <p className="text-xs text-ink-muted">Account equity (GBP)</p>
         </div>
         <p className="text-xs font-medium tracking-wide text-ink-muted uppercase">
-          Illustrative reconstruction
+          {badge}
         </p>
       </figcaption>
 
@@ -154,7 +156,7 @@ export function BacktestEquityChart({
                 stroke="var(--dc-surface)"
                 strokeWidth={2}
                 label={{
-                  value: "Max DD −21.3%",
+                  value: `Max DD ${formatSignedPercent(maxDd.value)}`,
                   position: "bottom",
                   fill: "var(--dc-negative)",
                   fontSize: 11,

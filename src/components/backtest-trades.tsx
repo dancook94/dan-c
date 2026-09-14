@@ -2,11 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { formatMoney, formatNumber } from "@/lib/format";
-import {
-  MARKET_FILTERS,
-  type BacktestTrade,
-  type MarketFilter,
-} from "@/lib/backtesting";
+import { MARKET_FILTERS, type BacktestTrade } from "@/lib/backtesting";
 
 const PAGE_SIZE = 10;
 
@@ -23,15 +19,20 @@ export function BacktestTrades({
   fullTradeCount,
   note,
   howToReplace,
+  marketFilters = MARKET_FILTERS,
+  dataFile = "public/data/backtesting/trades.json",
 }: {
   trades: BacktestTrade[];
   sample: boolean;
   fullTradeCount: number;
   note: string;
   howToReplace: string;
+  marketFilters?: readonly string[];
+  dataFile?: string;
 }) {
-  const [market, setMarket] = useState<MarketFilter>("All");
+  const [market, setMarket] = useState("All");
   const [page, setPage] = useState(1);
+  const showNotes = trades.some((trade) => Boolean(trade.notes));
 
   const filtered = useMemo(() => {
     if (market === "All") return trades;
@@ -58,7 +59,7 @@ export function BacktestTrades({
           role="group"
           aria-label="Filter trades by market"
         >
-          {MARKET_FILTERS.map((item) => {
+          {marketFilters.map((item) => {
             const active = item === market;
             return (
               <button
@@ -96,19 +97,20 @@ export function BacktestTrades({
               <th className="px-5 py-3 font-medium">Side</th>
               <th className="px-5 py-3 font-medium">P&amp;L</th>
               <th className="px-5 py-3 font-medium">R</th>
+              {showNotes ? (
+                <th className="px-5 py-3 font-medium">Notes</th>
+              ) : null}
             </tr>
           </thead>
           <tbody>
             {slice.length === 0 ? (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={showNotes ? 7 : 6}
                   className="px-5 py-10 text-center text-ink-muted"
                 >
                   No trades in this view. Add rows to{" "}
-                  <code className="font-mono text-xs">
-                    public/data/backtesting/trades.json
-                  </code>
+                  <code className="font-mono text-xs">{dataFile}</code>
                   .
                 </td>
               </tr>
@@ -142,6 +144,11 @@ export function BacktestTrades({
                     <td className="px-5 py-3 font-mono text-xs tabular-nums">
                       {formatNumber(trade.rMultiple, 2)}
                     </td>
+                    {showNotes ? (
+                      <td className="px-5 py-3 text-xs text-ink-muted">
+                        {trade.notes ?? "—"}
+                      </td>
+                    ) : null}
                   </tr>
                 );
               })

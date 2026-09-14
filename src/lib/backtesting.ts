@@ -75,6 +75,101 @@ export type TradesPayload = {
   trades: BacktestTrade[];
 };
 
+export type BacktestMarket = {
+  id: string;
+  label: string;
+  broker: string;
+  sharePct: number;
+  pnl: number;
+  note: string;
+  trades?: number;
+  monthsSelected?: number;
+};
+
+export type MarketsPayload = {
+  schemaVersion: 1;
+  slug?: string;
+  currency: BacktestCurrency;
+  netPnl?: number;
+  note: string;
+  howToReplace: string;
+  markets: BacktestMarket[];
+};
+
+export type YearsPayload = {
+  schemaVersion: 1;
+  kind: string;
+  currency: BacktestCurrency;
+  note: string;
+  howToReplace: string;
+  years: YearlyReturn[];
+};
+
+export type BacktestValidation = {
+  inSampleTo: string;
+  inSampleEquity?: number;
+  inSampleCagrPct: number;
+  inSampleMaxDrawdownPct: number;
+  oosResetPeriod: string;
+  oosResetCagrPct: number;
+  walkForwardOosCagrPct: number;
+  walkForwardOosMaxDrawdownPct: number;
+  spreadStressCagrPct?: number;
+  spreadStress: string;
+  cashMonths: number;
+  totalMonths: number;
+  cashMonthsNote: string;
+};
+
+export type SummaryPayload = {
+  schemaVersion: 1;
+  slug: string;
+  href: string;
+  title: string;
+  kind: string;
+  currency: BacktestCurrency;
+  startingEquity: number;
+  endingEquity: number;
+  netPnl: number;
+  closedPnl?: number;
+  cagrPct: number;
+  maxDrawdownPct: number;
+  sharpe: number;
+  trades: number;
+  winRatePct: number;
+  profitFactor: number;
+  periodLabel: string;
+  vendor: string;
+  startDate: string;
+  endDate: string;
+  afterCosts: boolean;
+  markets: string[];
+  marketAliases?: Record<string, string>;
+  validation: BacktestValidation;
+  costsNote: string;
+  note: string;
+  howToReplace: string;
+};
+
+export type BacktestArchiveBook = {
+  slug: string;
+  href: string;
+  title: string;
+  cagrPct: number;
+  maxDrawdownPct: number;
+  periodLabel?: string;
+  dataDir?: string;
+};
+
+export type ArchivePayload = {
+  schemaVersion: 1;
+  rule: string;
+  thresholdCagrPct: number;
+  note: string;
+  howToReplace: string;
+  books: BacktestArchiveBook[];
+};
+
 export const BACKTEST_SUMMARY = {
   currency: "GBP" as const,
   startingEquity: 5000,

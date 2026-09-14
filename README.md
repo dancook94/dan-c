@@ -18,6 +18,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | `/` | Promise, three KPI placeholders, mini equity shell |
 | `/results` | Equity, drawdown, KPIs, monthly table, trade log |
 | `/backtesting` | Hypothetical H4 Donchian multi-market research deep-dive |
+| `/backtesting/dual-momentum` | Hypothetical four-market dual momentum research deep-dive |
 | `/method` | Opening-range breakout v1 in plain English |
 | `/course` | “Build a trading robot” waitlist |
 | `/about` | Who / UK / full risk disclosure |
@@ -69,22 +70,36 @@ Example empty payload (what ships today):
 
 ## Backtesting JSON
 
-`/backtesting` reads static files under `public/data/backtesting/`:
+Archive rule: **publish a dedicated Backtesting page for every locked book whose full-sample after-costs CAGR is ≥ 15%.** The index lives at `public/data/backtesting/archive.json` and `src/lib/backtesting-archive.ts`.
+
+`/backtesting` (H4 Donchian) reads static files under `public/data/backtesting/`:
 
 | File | Role |
 | --- | --- |
+| `archive.json` | Research archive index and the ≥15% CAGR publish rule |
 | `equity_curve.json` | Daily reconstructed equity path + yearly returns + annotations |
 | `trades.json` | Paginated trade table. Ships as a labelled SAMPLE until a full export lands |
 
-Headline KPIs (CAGR, max DD, trade count, profit factor, per-market P&L) are the approved research summary. The equity line is an illustrative reconstruction that hits those checkpoints — it is **not** a raw Dukascopy tick export. Sample trades are prefixed `SAMPLE-` and set `"sample": true`.
+`/backtesting/dual-momentum` reads `public/data/backtesting/dual-momentum/`:
+
+| File | Role |
+| --- | --- |
+| `summary.json` | Locked after-costs headline KPIs and validation splits |
+| `markets.json` | Per-market closed P&L |
+| `equity_curve.json` | Weekday interpolation of locked year-end equity until a daily dump lands |
+| `years.json` | Locked calendar year-end equity (kept separate so a dump can replace it without the daily series) |
+| `trades.json` | Paginated SAMPLE trade table until a full 67-row export lands |
+
+Headline KPIs (CAGR, max DD, trade count, profit factor, per-market P&L) are the approved research summary. Dual-momentum `equity_curve.json` interpolates locked year-end equity — it is **not** a raw Dukascopy daily export, and the −52.18% max drawdown is intra-year so it does not appear on that line. Sample trades are prefixed `SAMPLE-` / `SAMPLE-DM-` and set `"sample": true`.
 
 To replace later:
 
 1. Overwrite `equity_curve.json` with a research dump that keeps `points[].date` (`YYYY-MM-DD`) and `points[].equity`. Optional: `points[].drawdownPct`, `annotations[]`, `yearlyReturns[]`.
-2. Overwrite `trades.json` with the full 1,122-row book. Set `"sample": false`. Required trade fields: `id`, `market`, `openedAt`, `closedAt`, `side`, `pnl`. Optional: `symbol`, `entry`, `exit`, `rMultiple`, `notes`.
-3. Regenerate the illustrative series with `node scripts/generate-backtesting-data.mjs` only if you still need a placeholder path.
+2. Overwrite `trades.json` with the full book. Set `"sample": false`. Required trade fields: `id`, `market`, `openedAt`, `closedAt`, `side`, `pnl`. Optional: `symbol`, `entry`, `exit`, `rMultiple`, `notes`.
+3. For dual momentum, also overwrite `summary.json`, `markets.json`, and `years.json` in that folder. Loaders already read by slug under `public/data/backtesting/{slug}/`.
+4. Regenerate an illustrative series with `node scripts/generate-backtesting-data.mjs` or `node scripts/generate-dual-momentum-data.mjs` only if you still need a placeholder path.
 
-Never present this page as live trading.
+Never present these pages as live trading.
 
 ## Deploy on Vercel
 
