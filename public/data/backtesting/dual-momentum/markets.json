@@ -2,41 +2,49 @@
   "schemaVersion": 1,
   "slug": "dual-momentum",
   "currency": "GBP",
-  "netPnl": 17296,
-  "note": "Approximate closed P&L by market. Shares are of net P&L (£17,296). Winners sum to more than 100% because two markets lost money.",
-  "howToReplace": "Overwrite public/data/backtesting/dual-momentum/markets.json. Keep schemaVersion: 1 and markets[] with id, label, broker, pnl, sharePct, note.",
+  "netPnl": 17293.85,
+  "note": "Locked closed P&L by market. Shares are of closed P&L (£17,293.85). Winners sum to more than 100% because two markets lost money. Account equity finished £22,295.79.",
+  "howToReplace": "Overwrite public/data/backtesting/dual-momentum/markets.json. Keep schemaVersion: 1 and markets[] with id, label, broker, pnl, sharePct, note. Optional: trades, monthsSelected.",
   "markets": [
     {
       "id": "XAUUSD",
       "label": "Gold",
       "broker": "XAUUSD",
-      "pnl": 9782,
-      "sharePct": 56.6,
-      "note": "Largest contributor. Same gold-heavy outcome as the Donchian book, different rules."
+      "pnl": 9781.85,
+      "trades": 14,
+      "monthsSelected": 57,
+      "note": "Largest contributor. Same gold-heavy outcome as the Donchian book, different rules.",
+      "sharePct": 56.56
     },
     {
       "id": "NAS100",
       "label": "US Tech 100",
       "broker": "NAS100 / USATECH",
-      "pnl": 9188,
-      "sharePct": 53.1,
-      "note": "Second-largest sleeve — most of the fat right tail sat here."
+      "pnl": 9187.99,
+      "trades": 16,
+      "monthsSelected": 86,
+      "note": "Second-largest sleeve — selected in 86 months, most of the right tail.",
+      "sharePct": 53.13
     },
     {
       "id": "US30",
       "label": "US 30",
       "broker": "US30 / USA30",
-      "pnl": -637,
-      "sharePct": -3.7,
-      "note": "Net loser over the window."
+      "pnl": -636.64,
+      "trades": 20,
+      "monthsSelected": 40,
+      "note": "Net loser over the window (20 trades).",
+      "sharePct": -3.68
     },
     {
       "id": "DE40",
       "label": "Germany 40",
       "broker": "DE40 / DEU40",
-      "pnl": -1039,
-      "sharePct": -6,
-      "note": "Net loser over the window."
+      "pnl": -1039.36,
+      "trades": 17,
+      "monthsSelected": 27,
+      "note": "Net loser over the window (17 trades).",
+      "sharePct": -6.01
     }
   ]
 }

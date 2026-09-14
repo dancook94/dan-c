@@ -1,11 +1,11 @@
 /**
- * Reconstructs a plausible daily equity path from locked dual-momentum
- * headline statistics, plus a clearly labelled SAMPLE trade list.
+ * Dual-momentum research JSON from locked after-costs checkpoints.
+ *
+ * Equity is a weekday interpolation of published year-end equity until a
+ * full daily fxday dump lands. Headline max DD (−52.18%) is intra-year and
+ * is NOT forced onto this line.
  *
  * Run: node scripts/generate-dual-momentum-data.mjs
- *
- * Replace the JSON under public/data/backtesting/dual-momentum/ with a
- * research export when the full Dukascopy / engine dump is available.
  */
 
 import { mkdir, writeFile } from "node:fs/promises";
@@ -17,48 +17,36 @@ const OUT_DIR = path.join(
 );
 
 const START_EQUITY = 5000;
-const END_EQUITY = 22296;
-const MAX_DD_PCT = -52.2;
+const END_EQUITY = 22295.79;
+const CLOSED_PNL = 17293.85;
+const MAX_DD_PCT = -52.18;
 const HEADLINE_CAGR_PCT = 15.05;
 const IS_CAGR_PCT = 7.43;
+const IS_EQUITY = 8860.92;
+const HOLDOUT_CAGR_PCT = 37.89;
+const WF_OOS_CAGR_PCT = 14.08;
+const WF_OOS_DD_PCT = -43.8;
+const STRESS_CAGR_PCT = 15.01;
 const START = "2016-01-04";
 const END = "2026-08-28";
 const IN_SAMPLE_TO = "2023-12-29";
-const PEAK_DATE = "2021-11-05";
-const PEAK_EQUITY = 11800;
-const TROUGH_DATE = "2022-10-14";
-const TROUGH_EQUITY =
-  Math.round(PEAK_EQUITY * (1 + MAX_DD_PCT / 100) * 100) / 100;
-const END_2023_EQUITY =
-  Math.round(START_EQUITY * (1 + IS_CAGR_PCT / 100) ** 8 * 100) / 100;
 
-/** Anchor dates force the path through known narrative points. */
-const ANCHORS = [
-  [START, START_EQUITY],
-  ["2016-12-30", START_EQUITY],
-  ["2017-12-29", 5620],
-  ["2018-09-28", 6180],
-  ["2018-12-24", 5890],
-  ["2018-12-31", 6040],
-  ["2019-12-31", 7280],
-  ["2020-02-19", 7860],
-  ["2020-03-23", 7040],
-  ["2020-04-30", 7040],
-  ["2020-12-31", 8680],
-  [PEAK_DATE, PEAK_EQUITY],
-  ["2021-12-31", 11240],
-  ["2022-06-01", 8420],
-  ["2022-08-31", 8420],
-  [TROUGH_DATE, TROUGH_EQUITY],
-  ["2022-12-30", 6280],
-  ["2023-03-31", 6280],
-  [IN_SAMPLE_TO, END_2023_EQUITY],
-  ["2024-06-28", 12180],
-  ["2024-12-31", 15460],
-  ["2025-06-30", 18120],
-  ["2025-12-31", 20540],
+/** Locked continuous year-end equity. 2026 is the 28 Aug snapshot. */
+const YEAR_ENDS = [
+  ["2016-12-30", 5000],
+  ["2017-12-29", 9016.76],
+  ["2018-12-31", 6955.33],
+  ["2019-12-31", 8482.4],
+  ["2020-12-31", 9943.35],
+  ["2021-12-31", 10584.49],
+  ["2022-12-30", 8871.42],
+  [IN_SAMPLE_TO, IS_EQUITY],
+  ["2024-12-31", 12155.87],
+  ["2025-12-31", 19608.35],
   [END, END_EQUITY],
 ];
+
+const ANCHORS = [[START, START_EQUITY], ...YEAR_ENDS];
 
 function parseISO(iso) {
   const [y, m, d] = iso.split("-").map(Number);
@@ -91,17 +79,6 @@ function logLerp(a, b, t) {
   return Math.exp(lerp(Math.log(a), Math.log(b), t));
 }
 
-function mulberry32(seed) {
-  let a = seed >>> 0;
-  return () => {
-    a += 0x6d2b79f5;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
 function buildEquity() {
   const days = tradingDays(START, END);
   const anchors = ANCHORS.map(([date, equity]) => ({
@@ -110,7 +87,6 @@ function buildEquity() {
     equity,
   }));
 
-  const rand = mulberry32(20160104);
   const raw = days.map((date) => {
     const t = parseISO(date);
     let i = 0;
@@ -121,14 +97,8 @@ function buildEquity() {
     const u = Math.min(1, Math.max(0, (t - a.t) / span));
     const flat = a.equity === b.equity;
     const base = flat ? a.equity : logLerp(a.equity, b.equity, u);
-    const noise = flat ? 0 : (rand() - 0.5) * 0.0034 * base;
-    return { date, equity: Math.max(4200, base + noise) };
+    return { date, equity: base };
   });
-
-  const byDate = new Map(raw.map((p) => [p.date, p]));
-  for (const [date, equity] of ANCHORS) {
-    if (byDate.has(date)) byDate.get(date).equity = equity;
-  }
 
   for (let i = 0; i < anchors.length - 1; i += 1) {
     const a = anchors[i];
@@ -138,15 +108,10 @@ function buildEquity() {
       return t >= a.t && t <= b.t;
     });
     if (segment.length < 2) continue;
-    const start = segment[0].equity;
-    const end = segment[segment.length - 1].equity;
-    const flat = a.equity === b.equity;
     for (let j = 0; j < segment.length; j += 1) {
       const u = j / (segment.length - 1);
-      const current = lerp(start, end, u);
-      const target = flat ? a.equity : logLerp(a.equity, b.equity, u);
-      const wiggle = flat ? 0 : segment[j].equity - current;
-      segment[j].equity = Math.round((target + wiggle * 0.28) * 100) / 100;
+      const target = a.equity === b.equity ? a.equity : logLerp(a.equity, b.equity, u);
+      segment[j].equity = Math.round(target * 100) / 100;
     }
     segment[0].equity = a.equity;
     segment[segment.length - 1].equity = b.equity;
@@ -156,21 +121,24 @@ function buildEquity() {
   raw[raw.length - 1].equity = END_EQUITY;
 
   let peak = raw[0].equity;
-  let maxDd = 0;
-  let maxDdDate = raw[0].date;
   const points = raw.map((p) => {
     peak = Math.max(peak, p.equity);
     const drawdownPct = peak > 0 ? ((p.equity - peak) / peak) * 100 : 0;
-    if (drawdownPct < maxDd) {
-      maxDd = drawdownPct;
-      maxDdDate = p.date;
-    }
     return {
       date: p.date,
       equity: Math.round(p.equity * 100) / 100,
       drawdownPct: Math.round(drawdownPct * 100) / 100,
     };
   });
+
+  let maxDd = 0;
+  let maxDdDate = points[0].date;
+  for (const p of points) {
+    if (p.drawdownPct < maxDd) {
+      maxDd = p.drawdownPct;
+      maxDdDate = p.date;
+    }
+  }
 
   return { points, maxDd, maxDdDate };
 }
@@ -426,40 +394,36 @@ function sampleTrades() {
     ],
   ];
 
-  return rows.map(
-    ([id, market, opened, closed, pnl, rMultiple, notes]) => ({
-      id,
-      sample: true,
-      market,
-      symbol: market,
-      side: "long",
-      openedAt: `${opened}T08:00:00.000Z`,
-      closedAt: `${closed}T16:00:00.000Z`,
-      pnl,
-      rMultiple,
-      notes,
-    }),
-  );
+  return rows.map(([id, market, opened, closed, pnl, rMultiple, notes]) => ({
+    id,
+    sample: true,
+    market,
+    symbol: market,
+    side: "long",
+    openedAt: `${opened}T08:00:00.000Z`,
+    closedAt: `${closed}T16:00:00.000Z`,
+    pnl,
+    rMultiple,
+    notes,
+  }));
 }
 
 const { points, maxDd, maxDdDate } = buildEquity();
 const years = yearlyReturns(points);
 const end2023 = yearEnd(points, 2023);
-const isCagr =
-  end2023 != null
-    ? (end2023.equity / START_EQUITY) ** (1 / 8) - 1
-    : null;
 const yearsSpan = (parseISO(END) - parseISO(START)) / (365.25 * 86400000);
 const cagr = (END_EQUITY / START_EQUITY) ** (1 / yearsSpan) - 1;
+const isCagr =
+  end2023 != null ? (end2023.equity / START_EQUITY) ** (1 / 8) - 1 : null;
 
 const sourceLabel =
-  "Illustrative daily path reconstructed from published headline statistics. Not a raw Dukascopy tick-by-tick export.";
+  "Weekday interpolation of locked year-end equity. Not a raw Dukascopy daily export. Intra-year path — including the −52.18% max drawdown — is not resolved on this line.";
 const howToReplaceEquity =
   "Overwrite public/data/backtesting/dual-momentum/equity_curve.json with a research export that keeps schemaVersion, points[].date (YYYY-MM-DD), points[].equity, and optional points[].drawdownPct plus annotations[].";
 
 const equityPayload = {
   schemaVersion: 1,
-  kind: "illustrative_reconstructed",
+  kind: "year_end_interpolated",
   currency: "GBP",
   startingEquity: START_EQUITY,
   endingEquity: END_EQUITY,
@@ -468,34 +432,28 @@ const equityPayload = {
   headlineCagrPct: HEADLINE_CAGR_PCT,
   reconstructedCagrPct: Math.round(cagr * 10000) / 100,
   inSampleTo: IN_SAMPLE_TO,
-  inSampleCagrPct: isCagr == null ? null : Math.round(isCagr * 10000) / 100,
+  inSampleCagrPct: IS_CAGR_PCT,
+  inSampleEquity: IS_EQUITY,
   maxDrawdownPct: Math.round(maxDd * 100) / 100,
   headlineMaxDrawdownPct: MAX_DD_PCT,
   source: {
-    type: "illustrative_reconstructed",
+    type: "year_end_interpolated",
     label: sourceLabel,
     inputs: [
       "Start £5,000 on 4 Jan 2016",
-      "End £22,296 on 28 Aug 2026",
-      "Headline CAGR +15.05% over ~2016–2026",
-      "In-sample to end-2023 ~+7.43% CAGR",
-      "Max drawdown −52.2% (in-sample)",
-      "Most of the remaining profit placed in 2024–26",
-      "2016 lookback warmup held in cash",
+      "Locked year-end equity 2016–2026",
+      "End £22,295.79 on 28 Aug 2026",
+      "Headline CAGR +15.05%",
+      "In-sample to end-2023 £8,860.92 (~+7.43% CAGR)",
+      "Headline max drawdown −52.18% (intra-year; not drawn on this interpolation)",
     ],
     howToReplace: howToReplaceEquity,
   },
   annotations: [
     {
-      date: maxDdDate,
-      type: "max_drawdown",
-      label: `Max drawdown ${MAX_DD_PCT.toFixed(1)}%`,
-      value: MAX_DD_PCT,
-    },
-    {
       date: IN_SAMPLE_TO,
       type: "in_sample_end",
-      label: "In-sample end (~+7.43% CAGR)",
+      label: "In-sample end (£8,860.92, ~+7.43% CAGR)",
       value: IS_CAGR_PCT,
     },
   ],
@@ -505,9 +463,9 @@ const equityPayload = {
 
 const yearsPayload = {
   schemaVersion: 1,
-  kind: "illustrative_reconstructed",
+  kind: "locked_year_end",
   currency: "GBP",
-  note: "Derived from the reconstructed equity path so the table matches the chart. 2026 is a partial year to 28 August. Replace this file independently of the daily points if you have calendar-year research totals.",
+  note: "Locked continuous year-end equity from the research book. 2026 is a partial year to 28 August. The −52.18% max drawdown is intra-year and does not appear as a year-end print.",
   howToReplace:
     "Overwrite public/data/backtesting/dual-momentum/years.json. Keep schemaVersion: 1 and years[] with year, startEquity, endEquity, netPnl, returnPct. Optional: partial, asOf.",
   years,
@@ -522,12 +480,13 @@ const summaryPayload = {
   currency: "GBP",
   startingEquity: START_EQUITY,
   endingEquity: END_EQUITY,
-  netPnl: END_EQUITY - START_EQUITY,
+  netPnl: Math.round((END_EQUITY - START_EQUITY) * 100) / 100,
+  closedPnl: CLOSED_PNL,
   cagrPct: HEADLINE_CAGR_PCT,
   maxDrawdownPct: MAX_DD_PCT,
   sharpe: 0.59,
   trades: 67,
-  winRatePct: 16.4,
+  winRatePct: 16.42,
   profitFactor: 4.15,
   periodLabel: "Jan 2016 – Aug 2026",
   vendor: "Dukascopy",
@@ -543,67 +502,78 @@ const summaryPayload = {
   },
   validation: {
     inSampleTo: "2023-12-31",
+    inSampleEquity: IS_EQUITY,
     inSampleCagrPct: IS_CAGR_PCT,
     inSampleMaxDrawdownPct: MAX_DD_PCT,
     oosResetPeriod: "2024–26",
-    oosResetCagrPct: 37.9,
-    walkForwardOosCagrPct: 14.1,
-    walkForwardOosMaxDrawdownPct: -43.8,
+    oosResetCagrPct: HOLDOUT_CAGR_PCT,
+    walkForwardOosCagrPct: WF_OOS_CAGR_PCT,
+    walkForwardOosMaxDrawdownPct: WF_OOS_DD_PCT,
+    spreadStressCagrPct: STRESS_CAGR_PCT,
     spreadStress:
-      "+50% spread stress barely moves (only 67 fills)",
+      "+50% spread stress: CAGR +15.01% versus full-sample +15.05% (67 fills)",
     cashMonths: 21,
     totalMonths: 128,
     cashMonthsNote: "Including 2016 lookback warmup",
   },
   costsNote:
     "Same research costs as the multi-market H4 Donchian book.",
-  note: "Locked after-costs headline statistics. Equity and trade files may still be illustrative reconstructions until a full fxday dump lands.",
+  note: "Locked after-costs headline statistics. Equity is a year-end interpolation until a full daily dump lands. Trade table remains SAMPLE until the 67-row book is exported.",
   howToReplace:
     "Overwrite public/data/backtesting/dual-momentum/summary.json with the locked research summary. Keep schemaVersion: 1 and the numeric fields used by the page (endingEquity, cagrPct, maxDrawdownPct, sharpe, trades, winRatePct, profitFactor, validation).",
 };
+
+const marketRows = [
+  {
+    id: "XAUUSD",
+    label: "Gold",
+    broker: "XAUUSD",
+    pnl: 9781.85,
+    trades: 14,
+    monthsSelected: 57,
+    note: "Largest contributor. Same gold-heavy outcome as the Donchian book, different rules.",
+  },
+  {
+    id: "NAS100",
+    label: "US Tech 100",
+    broker: "NAS100 / USATECH",
+    pnl: 9187.99,
+    trades: 16,
+    monthsSelected: 86,
+    note: "Second-largest sleeve — selected in 86 months, most of the right tail.",
+  },
+  {
+    id: "US30",
+    label: "US 30",
+    broker: "US30 / USA30",
+    pnl: -636.64,
+    trades: 20,
+    monthsSelected: 40,
+    note: "Net loser over the window (20 trades).",
+  },
+  {
+    id: "DE40",
+    label: "Germany 40",
+    broker: "DE40 / DEU40",
+    pnl: -1039.36,
+    trades: 17,
+    monthsSelected: 27,
+    note: "Net loser over the window (17 trades).",
+  },
+].map((market) => ({
+  ...market,
+  sharePct: Math.round((market.pnl / CLOSED_PNL) * 10000) / 100,
+}));
 
 const marketsPayload = {
   schemaVersion: 1,
   slug: "dual-momentum",
   currency: "GBP",
-  netPnl: END_EQUITY - START_EQUITY,
-  note: "Approximate closed P&L by market. Shares are of net P&L (£17,296). Winners sum to more than 100% because two markets lost money.",
+  netPnl: CLOSED_PNL,
+  note: "Locked closed P&L by market. Shares are of closed P&L (£17,293.85). Winners sum to more than 100% because two markets lost money. Account equity finished £22,295.79.",
   howToReplace:
-    "Overwrite public/data/backtesting/dual-momentum/markets.json. Keep schemaVersion: 1 and markets[] with id, label, broker, pnl, sharePct, note.",
-  markets: [
-    {
-      id: "XAUUSD",
-      label: "Gold",
-      broker: "XAUUSD",
-      pnl: 9782,
-      sharePct: 56.6,
-      note: "Largest contributor. Same gold-heavy outcome as the Donchian book, different rules.",
-    },
-    {
-      id: "NAS100",
-      label: "US Tech 100",
-      broker: "NAS100 / USATECH",
-      pnl: 9188,
-      sharePct: 53.1,
-      note: "Second-largest sleeve — most of the fat right tail sat here.",
-    },
-    {
-      id: "US30",
-      label: "US 30",
-      broker: "US30 / USA30",
-      pnl: -637,
-      sharePct: -3.7,
-      note: "Net loser over the window.",
-    },
-    {
-      id: "DE40",
-      label: "Germany 40",
-      broker: "DE40 / DEU40",
-      pnl: -1039,
-      sharePct: -6.0,
-      note: "Net loser over the window.",
-    },
-  ],
+    "Overwrite public/data/backtesting/dual-momentum/markets.json. Keep schemaVersion: 1 and markets[] with id, label, broker, pnl, sharePct, note. Optional: trades, monthsSelected.",
+  markets: marketRows,
 };
 
 const tradesPayload = {
@@ -647,13 +617,12 @@ console.log(
       days: points.length,
       start: points[0],
       end: points[points.length - 1],
-      maxDd,
-      maxDdDate,
-      troughEquity: TROUGH_EQUITY,
+      interpolatedMaxDd: maxDd,
+      interpolatedMaxDdDate: maxDdDate,
       end2023: end2023?.equity,
       isCagrPct: isCagr == null ? null : +(isCagr * 100).toFixed(2),
       cagrPct: +(cagr * 100).toFixed(2),
-      sampleTrades: tradesPayload.trades.length,
+      years: years.map((y) => [y.year, y.endEquity, y.returnPct]),
     },
     null,
     2,

@@ -86,11 +86,11 @@ Archive rule: **publish a dedicated Backtesting page for every locked book whose
 | --- | --- |
 | `summary.json` | Locked after-costs headline KPIs and validation splits |
 | `markets.json` | Per-market closed P&L |
-| `equity_curve.json` | Illustrative daily path hitting published checkpoints |
-| `years.json` | Calendar-year table (kept separate so a dump can replace it without the daily series) |
+| `equity_curve.json` | Weekday interpolation of locked year-end equity until a daily dump lands |
+| `years.json` | Locked calendar year-end equity (kept separate so a dump can replace it without the daily series) |
 | `trades.json` | Paginated SAMPLE trade table until a full 67-row export lands |
 
-Headline KPIs (CAGR, max DD, trade count, profit factor, per-market P&L) are the approved research summary. The equity line is an illustrative reconstruction that hits those checkpoints — it is **not** a raw Dukascopy tick export. Sample trades are prefixed `SAMPLE-` / `SAMPLE-DM-` and set `"sample": true`.
+Headline KPIs (CAGR, max DD, trade count, profit factor, per-market P&L) are the approved research summary. Dual-momentum `equity_curve.json` interpolates locked year-end equity — it is **not** a raw Dukascopy daily export, and the −52.18% max drawdown is intra-year so it does not appear on that line. Sample trades are prefixed `SAMPLE-` / `SAMPLE-DM-` and set `"sample": true`.
 
 To replace later:
 

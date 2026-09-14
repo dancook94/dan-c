@@ -19,7 +19,7 @@
       "href": "/backtesting/dual-momentum",
       "title": "Four-market dual momentum",
       "cagrPct": 15.05,
-      "maxDrawdownPct": -52.2,
+      "maxDrawdownPct": -52.18,
       "periodLabel": "Jan 2016 – Aug 2026",
       "dataDir": "public/data/backtesting/dual-momentum"
     }

@@ -36,10 +36,12 @@ export function BacktestEquityChart({
   points,
   annotations,
   caption,
+  badge = "Illustrative reconstruction",
 }: {
   points: EquityPoint[];
   annotations: EquityAnnotation[];
   caption: string;
+  badge?: string;
 }) {
   const { yearTicks, maxDd, inSample, maxDdPoint } = useMemo(() => {
     const ticks = points
@@ -71,7 +73,7 @@ export function BacktestEquityChart({
           <p className="text-xs text-ink-muted">Account equity (GBP)</p>
         </div>
         <p className="text-xs font-medium tracking-wide text-ink-muted uppercase">
-          Illustrative reconstruction
+          {badge}
         </p>
       </figcaption>
 

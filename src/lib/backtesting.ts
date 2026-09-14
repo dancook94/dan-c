@@ -82,6 +82,8 @@ export type BacktestMarket = {
   sharePct: number;
   pnl: number;
   note: string;
+  trades?: number;
+  monthsSelected?: number;
 };
 
 export type MarketsPayload = {
@@ -105,12 +107,14 @@ export type YearsPayload = {
 
 export type BacktestValidation = {
   inSampleTo: string;
+  inSampleEquity?: number;
   inSampleCagrPct: number;
   inSampleMaxDrawdownPct: number;
   oosResetPeriod: string;
   oosResetCagrPct: number;
   walkForwardOosCagrPct: number;
   walkForwardOosMaxDrawdownPct: number;
+  spreadStressCagrPct?: number;
   spreadStress: string;
   cashMonths: number;
   totalMonths: number;
@@ -127,6 +131,7 @@ export type SummaryPayload = {
   startingEquity: number;
   endingEquity: number;
   netPnl: number;
+  closedPnl?: number;
   cagrPct: number;
   maxDrawdownPct: number;
   sharpe: number;
