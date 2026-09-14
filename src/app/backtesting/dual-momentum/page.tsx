@@ -322,8 +322,10 @@ export default async function DualMomentumBacktestPage() {
         <section className="mt-10">
           <h2 className="text-xl font-semibold text-ink">Yearly returns</h2>
           <p className="mt-2 max-w-2xl text-sm text-ink-muted">
-            {years.note} 2016 is the 12-month lookback warmup (cash). 2022 is
-            the hole. 2024–25 hold most of the remaining gain.
+            Derived from the reconstructed equity path so the table matches the
+            chart. 2016 is the 12-month lookback warmup (cash). 2022 is the hole.
+            2024–25 hold most of the remaining gain. 2026 is a partial year to
+            28 August.
           </p>
           <div className="mt-4 overflow-hidden rounded-lg border border-border bg-surface shadow-card">
             <div className="overflow-x-auto">
