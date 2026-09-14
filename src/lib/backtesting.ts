@@ -40,8 +40,8 @@ export type EquityCurvePayload = {
   source: {
     type: string;
     label: string;
-    inputs: string[];
-    howToReplace: string;
+    inputs?: string[];
+    howToReplace?: string;
   };
   annotations: EquityAnnotation[];
   yearlyReturns: YearlyReturn[];
