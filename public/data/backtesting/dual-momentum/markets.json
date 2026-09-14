@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "slug": "dual-momentum",
+  "currency": "GBP",
+  "netPnl": 17296,
+  "note": "Approximate closed P&L by market. Shares are of net P&L (£17,296). Winners sum to more than 100% because two markets lost money.",
+  "howToReplace": "Overwrite public/data/backtesting/dual-momentum/markets.json. Keep schemaVersion: 1 and markets[] with id, label, broker, pnl, sharePct, note.",
+  "markets": [
+    {
+      "id": "XAUUSD",
+      "label": "Gold",
+      "broker": "XAUUSD",
+      "pnl": 9782,
+      "sharePct": 56.6,
+      "note": "Largest contributor. Same gold-heavy outcome as the Donchian book, different rules."
+    },
+    {
+      "id": "NAS100",
+      "label": "US Tech 100",
+      "broker": "NAS100 / USATECH",
+      "pnl": 9188,
+      "sharePct": 53.1,
+      "note": "Second-largest sleeve — most of the fat right tail sat here."
+    },
+    {
+      "id": "US30",
+      "label": "US 30",
+      "broker": "US30 / USA30",
+      "pnl": -637,
+      "sharePct": -3.7,
+      "note": "Net loser over the window."
+    },
+    {
+      "id": "DE40",
+      "label": "Germany 40",
+      "broker": "DE40 / DEU40",
+      "pnl": -1039,
+      "sharePct": -6,
+      "note": "Net loser over the window."
+    }
+  ]
+}

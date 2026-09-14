@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "rule": "Publish a dedicated Backtesting page for every locked book whose full-sample after-costs CAGR is ≥ 15%.",
+  "thresholdCagrPct": 15,
+  "note": "Archived because the locked full-sample CAGR clears 15%, not because a book is preferred. Dual momentum is not a substitute for the H4 Donchian page.",
+  "howToReplace": "Add a book object here when a new locked research book clears the 15% CAGR archive rule, and add a matching route under /backtesting/{slug} with JSON in public/data/backtesting/{slug}/.",
+  "books": [
+    {
+      "slug": "h4-donchian",
+      "href": "/backtesting",
+      "title": "Multi-market H4 Donchian",
+      "cagrPct": 18.7,
+      "maxDrawdownPct": -21.3,
+      "periodLabel": "Jan 2016 – Aug 2026",
+      "dataDir": "public/data/backtesting"
+    },
+    {
+      "slug": "dual-momentum",
+      "href": "/backtesting/dual-momentum",
+      "title": "Four-market dual momentum",
+      "cagrPct": 15.05,
+      "maxDrawdownPct": -52.2,
+      "periodLabel": "Jan 2016 – Aug 2026",
+      "dataDir": "public/data/backtesting/dual-momentum"
+    }
+  ]
+}

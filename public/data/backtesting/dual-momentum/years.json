@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "kind": "illustrative_reconstructed",
+  "currency": "GBP",
+  "note": "Derived from the reconstructed equity path so the table matches the chart. 2026 is a partial year to 28 August. Replace this file independently of the daily points if you have calendar-year research totals.",
+  "howToReplace": "Overwrite public/data/backtesting/dual-momentum/years.json. Keep schemaVersion: 1 and years[] with year, startEquity, endEquity, netPnl, returnPct. Optional: partial, asOf.",
+  "years": [
+    {
+      "year": 2016,
+      "startEquity": 5000,
+      "endEquity": 5000,
+      "netPnl": 0,
+      "returnPct": 0,
+      "partial": false,
+      "asOf": "2016-12-30"
+    },
+    {
+      "year": 2017,
+      "startEquity": 5000,
+      "endEquity": 5620,
+      "netPnl": 620,
+      "returnPct": 12.4,
+      "partial": false,
+      "asOf": "2017-12-29"
+    },
+    {
+      "year": 2018,
+      "startEquity": 5620,
+      "endEquity": 6040,
+      "netPnl": 420,
+      "returnPct": 7.47,
+      "partial": false,
+      "asOf": "2018-12-31"
+    },
+    {
+      "year": 2019,
+      "startEquity": 6040,
+      "endEquity": 7280,
+      "netPnl": 1240,
+      "returnPct": 20.53,
+      "partial": false,
+      "asOf": "2019-12-31"
+    },
+    {
+      "year": 2020,
+      "startEquity": 7280,
+      "endEquity": 8680,
+      "netPnl": 1400,
+      "returnPct": 19.23,
+      "partial": false,
+      "asOf": "2020-12-31"
+    },
+    {
+      "year": 2021,
+      "startEquity": 8680,
+      "endEquity": 11240,
+      "netPnl": 2560,
+      "returnPct": 29.49,
+      "partial": false,
+      "asOf": "2021-12-31"
+    },
+    {
+      "year": 2022,
+      "startEquity": 11240,
+      "endEquity": 6280,
+      "netPnl": -4960,
+      "returnPct": -44.13,
+      "partial": false,
+      "asOf": "2022-12-30"
+    },
+    {
+      "year": 2023,
+      "startEquity": 6280,
+      "endEquity": 8871.04,
+      "netPnl": 2591.04,
+      "returnPct": 41.26,
+      "partial": false,
+      "asOf": "2023-12-29"
+    },
+    {
+      "year": 2024,
+      "startEquity": 8871.04,
+      "endEquity": 15460,
+      "netPnl": 6588.96,
+      "returnPct": 74.27,
+      "partial": false,
+      "asOf": "2024-12-31"
+    },
+    {
+      "year": 2025,
+      "startEquity": 15460,
+      "endEquity": 20540,
+      "netPnl": 5080,
+      "returnPct": 32.86,
+      "partial": false,
+      "asOf": "2025-12-31"
+    },
+    {
+      "year": 2026,
+      "startEquity": 20540,
+      "endEquity": 22296,
+      "netPnl": 1756,
+      "returnPct": 8.55,
+      "partial": true,
+      "asOf": "2026-08-28"
+    }
+  ]
+}

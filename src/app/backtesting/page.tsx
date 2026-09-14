@@ -4,6 +4,7 @@ import { BacktestEquityChart } from "@/components/backtest-equity-chart";
 import { BacktestTrades } from "@/components/backtest-trades";
 import { Container } from "@/components/container";
 import { Disclaimer, PerformanceNote } from "@/components/disclaimer";
+import { ResearchArchive } from "@/components/research-archive";
 import { StatCard } from "@/components/stat-card";
 import {
   BACKTEST_MARKETS,
@@ -11,7 +12,11 @@ import {
   BACKTEST_SUMMARY,
   downsampleEquity,
 } from "@/lib/backtesting";
-import { loadBacktestTrades, loadEquityCurve } from "@/lib/load-backtesting";
+import {
+  loadBacktestArchive,
+  loadBacktestTrades,
+  loadEquityCurve,
+} from "@/lib/load-backtesting";
 import { formatMoney, formatNumber, formatPercent } from "@/lib/format";
 
 export const metadata: Metadata = {
@@ -28,9 +33,10 @@ const MARKET_BAR = [
 ] as const;
 
 export default async function BacktestingPage() {
-  const [equity, trades] = await Promise.all([
+  const [equity, trades, archive] = await Promise.all([
     loadEquityCurve(),
     loadBacktestTrades(),
+    loadBacktestArchive(),
   ]);
 
   const chartPoints = downsampleEquity(
@@ -99,6 +105,14 @@ export default async function BacktestingPage() {
             </li>
           </ul>
         </section>
+
+        <div className="mt-6">
+          <ResearchArchive
+            rule={archive.rule}
+            books={archive.books}
+            currentHref="/backtesting"
+          />
+        </div>
 
         <section
           aria-label="Headline backtest statistics"

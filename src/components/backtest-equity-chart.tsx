@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { formatMoney, formatPercent } from "@/lib/format";
+import { formatMoney, formatPercent, formatSignedPercent } from "@/lib/format";
 import type { EquityAnnotation, EquityPoint } from "@/lib/backtesting";
 import {
   Area,
@@ -154,7 +154,7 @@ export function BacktestEquityChart({
                 stroke="var(--dc-surface)"
                 strokeWidth={2}
                 label={{
-                  value: "Max DD −21.3%",
+                  value: `Max DD ${formatSignedPercent(maxDd.value)}`,
                   position: "bottom",
                   fill: "var(--dc-negative)",
                   fontSize: 11,
