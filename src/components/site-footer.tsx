@@ -23,6 +23,9 @@ export function SiteFooter() {
             <Link href="/backtesting" className="text-ink-muted hover:text-ink">
               Backtesting
             </Link>
+            <Link href="/forward-test" className="text-ink-muted hover:text-ink">
+              Forward test
+            </Link>
             <Link
               href="/backtesting/dual-momentum"
               className="text-ink-muted hover:text-ink"
