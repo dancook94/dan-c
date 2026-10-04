@@ -114,7 +114,9 @@ Never present these pages as live trading.
 
 An MT5 Expert Advisor posts each event. The site stores them in a **private Vercel Blob** object (`forward-test/book.json`). The same `id` + `type` is an upsert, so a repeated post replaces that event instead of inserting a duplicate. Vercel KV is not used — `@vercel/kv` is sunset. Blob is one token and one JSON document, with an ETag check so overlapping posts do not drop each other.
 
-Until the first open or close, the page says: “Forward test starting October 2026 — no trades yet”.
+The start date is the earliest stored open or equity snapshot. Until one of those arrives, the start-date card says “Starting October 2026”. Until the first open or close, the page also says: “Forward test starting October 2026 — no trades yet”.
+
+`scripts/post-test-event.mjs` uses ids prefixed `SAMPLE-FT-` and will only post them to localhost. On Vercel those ids are rejected and omitted from the public book, so a sample payload cannot seed production.
 
 ### Environment variables
 

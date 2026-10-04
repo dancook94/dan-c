@@ -8,6 +8,8 @@ import {
 import {
   applyForwardTestEvent,
   emptyForwardTestBook,
+  isSampleForwardTestId,
+  omitSampleForwardTestEvents,
   summarizeForwardTest,
   unavailableForwardTestSummary,
   type ForwardTestBook,
@@ -22,7 +24,7 @@ const LOCAL_PATH = path.join(process.cwd(), ".data", "forward-test", "book.json"
 export class ForwardTestStoreError extends Error {
   constructor(
     message: string,
-    readonly code: "unconfigured" | "corrupt",
+    readonly code: "unconfigured" | "corrupt" | "sample",
   ) {
     super(message);
     this.name = "ForwardTestStoreError";
@@ -57,7 +59,10 @@ export async function loadForwardTestSummary(): Promise<ForwardTestSummary> {
   }
   try {
     const { book } = await readBook();
-    return summarizeForwardTest(book.events, { storage });
+    const events = onVercel()
+      ? omitSampleForwardTestEvents(book.events)
+      : book.events;
+    return summarizeForwardTest(events, { storage });
   } catch (error) {
     console.error(
       "forward-test read failed",
@@ -70,6 +75,12 @@ export async function loadForwardTestSummary(): Promise<ForwardTestSummary> {
 export async function upsertForwardTestEvent(
   event: ForwardTestEvent,
 ): Promise<{ created: boolean }> {
+  if (onVercel() && isSampleForwardTestId(event.id)) {
+    throw new ForwardTestStoreError(
+      "Sample events are not stored on Vercel.",
+      "sample",
+    );
+  }
   const storage = forwardTestStorageMode();
   if (storage === "unconfigured") {
     throw new ForwardTestStoreError(
@@ -86,7 +97,7 @@ async function upsertBlob(event: ForwardTestEvent): Promise<{ created: boolean }
   let lastError: unknown;
   for (let attempt = 0; attempt < 5; attempt += 1) {
     const loaded = await readBlob();
-    const applied = applyForwardTestEvent(loaded.book, event);
+    const applied = applyForwardTestEvent(bookForWrite(loaded.book), event);
     try {
       await put(BLOB_PATH, JSON.stringify(applied.book), {
         access: "private",
@@ -112,7 +123,7 @@ async function upsertBlob(event: ForwardTestEvent): Promise<{ created: boolean }
 
 async function upsertLocal(event: ForwardTestEvent): Promise<{ created: boolean }> {
   const { book } = await readLocal();
-  const applied = applyForwardTestEvent(book, event);
+  const applied = applyForwardTestEvent(bookForWrite(book), event);
   await writeLocal(applied.book);
   return { created: applied.created };
 }
@@ -146,6 +157,14 @@ async function writeLocal(book: ForwardTestBook): Promise<void> {
   const tmp = `${LOCAL_PATH}.${process.pid}.tmp`;
   await writeFile(tmp, JSON.stringify(book), "utf8");
   await rename(tmp, LOCAL_PATH);
+}
+
+function bookForWrite(book: ForwardTestBook): ForwardTestBook {
+  if (!onVercel()) return book;
+  return {
+    schemaVersion: 1,
+    events: omitSampleForwardTestEvents(book.events),
+  };
 }
 
 function parseStoredBook(text: string): ForwardTestBook {

@@ -90,7 +90,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: error.message }, { status: 409 });
     }
     if (error instanceof ForwardTestStoreError) {
-      const status = error.code === "unconfigured" ? 503 : 500;
+      const status =
+        error.code === "unconfigured" ? 503 : error.code === "sample" ? 400 : 500;
       return NextResponse.json({ ok: false, error: error.message }, { status });
     }
     console.error(

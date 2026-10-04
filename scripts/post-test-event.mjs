@@ -6,17 +6,13 @@
  *   FORWARD_TEST_TOKEN=dev-token node scripts/post-test-event.mjs --type close
  *   FORWARD_TEST_TOKEN=dev-token node scripts/post-test-event.mjs --type equity
  *
- * Remote demo book — refused unless you pass --confirm-remote:
+ * A real payload can be posted to the demo host only with --file and
+ * --confirm-remote. Built-in SAMPLE-FT ids are refused off localhost,
+ * including when --confirm-remote is set. Vercel also rejects those ids.
+ *
  *   FORWARD_TEST_URL=https://dan-c.vercel.app \
  *   FORWARD_TEST_TOKEN=... \
- *   node scripts/post-test-event.mjs --type open --confirm-remote
- *
- * Replace the sample body with your own JSON:
- *   node scripts/post-test-event.mjs --file ./event.json
- *
- * Sample ids are prefixed SAMPLE-FT-. Delete them from the store if you
- * posted them against the real demo by sending the same id and type again
- * only replaces that row; it does not delete it.
+ *   node scripts/post-test-event.mjs --file ./event.json --confirm-remote
  */
 
 import { readFile } from "node:fs/promises";
@@ -43,12 +39,6 @@ if (!token) {
 }
 
 const remote = !/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(base);
-if (remote && !args.includes("--confirm-remote")) {
-  console.error(
-    `Refusing to post a sample event to ${base}. Pass --confirm-remote if that demo book is the one you mean to update.`,
-  );
-  process.exit(1);
-}
 
 const samples = {
   open: {
@@ -97,6 +87,24 @@ if (file) {
   process.exit(1);
 } else {
   payload = samples[type];
+}
+
+function isSampleId(id) {
+  return typeof id === "string" && id.toUpperCase().startsWith("SAMPLE-FT");
+}
+
+const payloadId = payload && payload.id != null ? String(payload.id) : "";
+if (remote && (!file || isSampleId(payloadId))) {
+  console.error(
+    `Refusing to post SAMPLE-FT data to ${base}. Built-in samples only go to localhost.`,
+  );
+  process.exit(1);
+}
+if (remote && !args.includes("--confirm-remote")) {
+  console.error(
+    `Refusing to post to ${base}. Pass --file with a real payload and --confirm-remote if that demo book is the one you mean to update.`,
+  );
+  process.exit(1);
 }
 
 const response = await fetch(`${base}/api/forward-test/events`, {

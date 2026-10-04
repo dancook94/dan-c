@@ -7,6 +7,7 @@ import assert from "node:assert/strict";
 import {
   applyForwardTestEvent,
   emptyForwardTestBook,
+  isSampleForwardTestId,
   parseForwardTestEvent,
   summarizeForwardTest,
   type ForwardTestEvent,
@@ -104,6 +105,8 @@ assert.equal(summary.avgR, 0.25);
 assert.equal(summary.profitFactor, 2);
 assert.equal(summary.currentEquity, 5050);
 assert.equal(summary.equitySource, "reconstructed");
+assert.equal(summary.startDate, "2026-10-02");
+assert.equal(summary.startLabel, "2 October 2026");
 assert.ok(summary.maxDrawdownPct !== null && summary.maxDrawdownPct < 0);
 assert.equal(summary.emptyMessage, null);
 
@@ -122,12 +125,57 @@ const withSnapshot = summarizeForwardTest([...book.events, snapshot], {
   now: new Date("2026-10-04T18:00:00.000Z"),
 });
 assert.equal(withSnapshot.equitySource, "snapshot");
+assert.equal(withSnapshot.startDate, "2026-10-02");
 assert.equal(withSnapshot.currentEquity, 4900);
 assert.equal(withSnapshot.balance, 5000);
 assert.ok(Math.abs((withSnapshot.maxDrawdownPct ?? 0) + 2) < 0.001);
 
 const empty = summarizeForwardTest([], { storage: "blob" });
 assert.equal(empty.status, "empty");
+assert.equal(empty.startDate, null);
+assert.equal(empty.startLabel, "Starting October 2026");
 assert.equal(empty.emptyMessage, "Forward test starting October 2026 — no trades yet");
+
+const equityFirst = event(
+  {
+    type: "equity",
+    id: "eq-early",
+    equity: 5000,
+    balance: 5000,
+    at: "2026-10-05T07:00:00Z",
+  },
+  "2026-10-05T07:00:01.000Z",
+);
+const laterOpen = event(
+  {
+    type: "open",
+    id: "200",
+    market: "DE40",
+    symbol: "DE40",
+    side: "long",
+    openedAt: "2026-10-06T09:00:00Z",
+    entry: 18000,
+    stop: 17900,
+    lots: 0.1,
+    riskPct: 1,
+  },
+  "2026-10-06T09:00:01.000Z",
+);
+const fromEquity = summarizeForwardTest([laterOpen, equityFirst], {
+  storage: "blob",
+  now: new Date("2026-10-06T12:00:00.000Z"),
+});
+assert.equal(fromEquity.startDate, "2026-10-05");
+assert.equal(fromEquity.startLabel, "5 October 2026");
+
+const closeOnly = summarizeForwardTest([closeA], {
+  storage: "blob",
+  now: new Date("2026-10-04T12:00:00.000Z"),
+});
+assert.equal(closeOnly.startDate, null);
+assert.equal(closeOnly.startLabel, "Starting October 2026");
+assert.equal(isSampleForwardTestId("SAMPLE-FT-1"), true);
+assert.equal(isSampleForwardTestId("sample-ft-eq"), true);
+assert.equal(isSampleForwardTestId("12345678"), false);
 
 console.log("forward-test checks passed");

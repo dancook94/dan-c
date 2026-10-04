@@ -12,11 +12,12 @@ export type ForwardEventType = "open" | "close" | "equity";
 
 export type ForwardSide = "long" | "short";
 
-export const FORWARD_TEST_START_DATE = "2026-10-01";
-
-export const FORWARD_TEST_START_LABEL = "1 October 2026";
+/** Shown until the EA posts an open or an equity snapshot. */
+export const FORWARD_TEST_PENDING_START_LABEL = "Starting October 2026";
 
 export const FORWARD_TEST_STARTING_EQUITY = BACKTEST_SUMMARY.startingEquity;
+
+const SAMPLE_ID_PREFIX = "SAMPLE-FT";
 
 export const FORWARD_TEST_EMPTY_MESSAGE =
   "Forward test starting October 2026 — no trades yet";
@@ -92,8 +93,8 @@ export type ForwardTestSummary = {
   account: "Pepperstone UK MT5 demo";
   book: string;
   markets: readonly ForwardMarket[];
-  startDate: typeof FORWARD_TEST_START_DATE;
-  startLabel: typeof FORWARD_TEST_START_LABEL;
+  startDate: string | null;
+  startLabel: string;
   startingEquity: number;
   currentEquity: number | null;
   balance: number | null;
@@ -126,6 +127,48 @@ export class ForwardTestCapacityError extends Error {
 
 export function emptyForwardTestBook(): ForwardTestBook {
   return { schemaVersion: 1, events: [] };
+}
+
+/** Local test ids. These must not be stored on Vercel. */
+export function isSampleForwardTestId(id: string): boolean {
+  return id.toUpperCase().startsWith(SAMPLE_ID_PREFIX);
+}
+
+export function omitSampleForwardTestEvents(
+  events: ForwardTestEvent[],
+): ForwardTestEvent[] {
+  return events.filter((event) => !isSampleForwardTestId(event.id));
+}
+
+/**
+ * The demo starts at the earliest open or equity snapshot.
+ * A close on its own does not set the start.
+ */
+export function earliestForwardTestStart(
+  events: ForwardTestEvent[],
+): string | null {
+  let earliest: string | null = null;
+  for (const event of events) {
+    const stamp =
+      event.type === "open"
+        ? event.openedAt
+        : event.type === "equity"
+          ? event.at
+          : null;
+    if (!stamp) continue;
+    if (!earliest || stamp < earliest) earliest = stamp;
+  }
+  return earliest;
+}
+
+export function formatForwardTestStartLabel(instant: string | null): string {
+  if (!instant) return FORWARD_TEST_PENDING_START_LABEL;
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(instant));
 }
 
 type ParseSuccess = {
@@ -326,7 +369,8 @@ export function summarizeForwardTest(
   }
   const profitFactor = grossLoss < 0 ? grossProfit / Math.abs(grossLoss) : null;
 
-  const curve = buildEquityCurve(snapshots, pricedCloses);
+  const startInstant = earliestForwardTestStart(events);
+  const curve = buildEquityCurve(snapshots, pricedCloses, startInstant);
   const currentEquity = curve.currentEquity;
   const returnPct =
     currentEquity === null
@@ -336,7 +380,17 @@ export function summarizeForwardTest(
 
   const latestSnapshot = snapshots.at(-1);
   const now = options.now ?? new Date();
-  const tradesPerMonth = tradesPerMonthSinceStart(pricedCloses.length, now);
+  const rateStart =
+    startInstant ??
+    pricedCloses
+      .map((event) => event.closedAt)
+      .filter((stamp): stamp is string => Boolean(stamp))
+      .sort()[0] ??
+    null;
+  const tradesPerMonth =
+    pricedCloses.length > 0 && rateStart
+      ? tradesPerMonthSinceStart(pricedCloses.length, now, rateStart)
+      : null;
 
   const updatedAt = events.reduce<string | null>((latest, event) => {
     if (!latest || event.receivedAt > latest) return event.receivedAt;
@@ -348,6 +402,8 @@ export function summarizeForwardTest(
   return {
     ...base,
     status: events.length === 0 ? "empty" : "active",
+    startDate: startInstant ? startInstant.slice(0, 10) : null,
+    startLabel: formatForwardTestStartLabel(startInstant),
     currentEquity,
     balance: latestSnapshot?.balance ?? null,
     equitySource: curve.source,
@@ -361,7 +417,7 @@ export function summarizeForwardTest(
     winRatePct,
     avgR,
     profitFactor,
-    tradesPerMonth: pricedCloses.length > 0 ? tradesPerMonth : null,
+    tradesPerMonth,
     updatedAt,
     emptyMessage: awaitingTrades ? FORWARD_TEST_EMPTY_MESSAGE : null,
     equityCurve: curve.points,
@@ -386,8 +442,8 @@ function summaryShell(storage: ForwardTestStorage): ForwardTestSummary {
     account: "Pepperstone UK MT5 demo",
     book: "H4 Donchian trend, long-only, 1% risk",
     markets: FORWARD_TEST_MARKETS,
-    startDate: FORWARD_TEST_START_DATE,
-    startLabel: FORWARD_TEST_START_LABEL,
+    startDate: null,
+    startLabel: FORWARD_TEST_PENDING_START_LABEL,
     startingEquity: FORWARD_TEST_STARTING_EQUITY,
     currentEquity: null,
     balance: null,
@@ -415,6 +471,7 @@ function summaryShell(storage: ForwardTestStorage): ForwardTestSummary {
 function buildEquityCurve(
   snapshots: Array<ForwardTestEvent & { equity: number; at: string }>,
   closes: Array<ForwardTestEvent & { pnl: number }>,
+  startInstant: string | null,
 ): {
   points: EquityPoint[];
   source: "snapshot" | "reconstructed" | "none";
@@ -423,13 +480,13 @@ function buildEquityCurve(
   maxDrawdownPct: number | null;
   maxDrawdownAt: string | null;
 } {
-  const startStamp = `${FORWARD_TEST_START_DATE}T00:00:00.000Z`;
-
   if (snapshots.length > 0) {
     const raw: Array<{ date: string; equity: number }> = [];
     const first = snapshots[0];
-    if (first.at > startStamp || first.equity !== FORWARD_TEST_STARTING_EQUITY) {
-      raw.push({ date: startStamp, equity: FORWARD_TEST_STARTING_EQUITY });
+    const anchor = startInstant ?? first.at;
+    const sameInstant = first.at === anchor;
+    if (!sameInstant || first.equity !== FORWARD_TEST_STARTING_EQUITY) {
+      raw.push({ date: anchor, equity: FORWARD_TEST_STARTING_EQUITY });
     }
     for (const snapshot of snapshots) {
       raw.push({ date: snapshot.at, equity: snapshot.equity });
@@ -456,8 +513,11 @@ function buildEquityCurve(
           a.id.localeCompare(b.id),
       );
     let equity = FORWARD_TEST_STARTING_EQUITY;
+    const firstClose = ordered[0];
+    const anchor =
+      startInstant ?? firstClose.closedAt ?? firstClose.receivedAt;
     const raw: Array<{ date: string; equity: number }> = [
-      { date: startStamp, equity },
+      { date: anchor, equity },
     ];
     for (const event of ordered) {
       equity += event.pnl;
@@ -508,8 +568,12 @@ function worstDrawdown(points: EquityPoint[]): EquityPoint | null {
   return worst;
 }
 
-function tradesPerMonthSinceStart(tradesClosed: number, now: Date): number {
-  const startMs = Date.parse(`${FORWARD_TEST_START_DATE}T00:00:00.000Z`);
+function tradesPerMonthSinceStart(
+  tradesClosed: number,
+  now: Date,
+  startInstant: string,
+): number {
+  const startMs = Date.parse(startInstant);
   const elapsed = Math.max(now.getTime() - startMs, MS_PER_MONTH / 30);
   return tradesClosed / (elapsed / MS_PER_MONTH);
 }

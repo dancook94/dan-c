@@ -56,7 +56,7 @@ export default async function ForwardTestPage() {
     summary.status === "unavailable"
       ? "The equity feed could not be read. This page retries about every five minutes."
       : summary.equitySource === "snapshot"
-        ? `Demo equity snapshots, including the £5,000 start on ${summary.startLabel}. Latest snapshot ${formatStamp(summary.equityAsOf)}.`
+        ? `Demo equity snapshots from ${summary.startLabel}. Latest snapshot ${formatStamp(summary.equityAsOf)}.`
         : summary.equitySource === "reconstructed"
           ? "No equity snapshot has arrived yet. This line is the £5,000 start plus closed P&L only, so open profit and loss is missing."
           : "The curve appears when the Expert Advisor posts an equity snapshot.";
@@ -77,8 +77,18 @@ export default async function ForwardTestPage() {
         </h1>
         <p className="mt-4 max-w-3xl text-lg text-ink-muted">
           The approved long-only book — US30, NAS100, XAUUSD, and DE40, 1% risk
-          — running on a {summary.account}, started at{" "}
-          {formatMoney(summary.startingEquity, "GBP")} on {summary.startLabel}.
+          — running on a {summary.account}
+          {summary.startDate ? (
+            <>
+              , started at {formatMoney(summary.startingEquity, "GBP")} on{" "}
+              {summary.startLabel}.
+            </>
+          ) : (
+            <>
+              , starting at {formatMoney(summary.startingEquity, "GBP")}.{" "}
+              {summary.startLabel}.
+            </>
+          )}
           Compare it with the hypothetical 2016–2026 research on{" "}
           <Link
             href="/backtesting"
@@ -138,7 +148,9 @@ export default async function ForwardTestPage() {
           <StatCard
             label="Start date"
             value={summary.startLabel}
-            caption={summary.account}
+            caption={
+              summary.startDate ? summary.account : "Waiting for the first EA event"
+            }
           />
           <StatCard
             label="Starting equity"
