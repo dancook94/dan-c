@@ -18,6 +18,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | `/` | Promise, three KPI placeholders, mini equity shell |
 | `/results` | Equity, drawdown, KPIs, monthly table, trade log |
 | `/backtesting` | Hypothetical H4 Donchian multi-market research deep-dive |
+| `/forward-test` | Demo-account forward test of that H4 Donchian book. Not live money |
 | `/backtesting/dual-momentum` | Hypothetical four-market dual momentum research deep-dive |
 | `/backtesting/tsmom` | Hypothetical four-market 12–1 month TSMOM research deep-dive |
 | `/backtesting/vol-target` | Hypothetical four-market vol-target SMA200 research deep-dive |
@@ -106,6 +107,108 @@ To replace later:
 4. Regenerate a placeholder path with `node scripts/generate-backtesting-data.mjs`, `node scripts/generate-dual-momentum-data.mjs`, `node scripts/generate-tsmom-data.mjs`, or `node scripts/generate-vol-target-data.mjs` only if you still need the scaffold.
 
 Never present these pages as live trading.
+
+## Forward test (demo account)
+
+`/forward-test` is the live forward test of the approved H4 Donchian book (US30, NAS100, XAUUSD, DE40; long-only; 1% risk) on a **Pepperstone UK MT5 demo** that starts at **£5,000** in **October 2026**. It is not live money. The page reads `GET /api/forward-test/summary` (revalidated about every five minutes) and shows headline stats, an equity curve, open positions, and closed trades beside the backtest expectations (win rate ~40%, profit factor 1.35, ~9 trades/month).
+
+An MT5 Expert Advisor posts each event. The site stores them in a **private Vercel Blob** object (`forward-test/book.json`). The same `id` + `type` is an upsert, so a repeated post replaces that event instead of inserting a duplicate. Vercel KV is not used — `@vercel/kv` is sunset. Blob is one token and one JSON document, with an ETag check so overlapping posts do not drop each other.
+
+The start date is the earliest stored open or equity snapshot. Until one of those arrives, the start-date card says “Starting October 2026”. Until the first open or close, the page also says: “Forward test starting October 2026 — no trades yet”.
+
+`scripts/post-test-event.mjs` uses ids prefixed `SAMPLE-FT-` and will only post them to localhost. On Vercel those ids are rejected and omitted from the public book, so a sample payload cannot seed production.
+
+### Environment variables
+
+Set both in the Vercel project (**Settings → Environment Variables**), for Production and Preview. Do not commit them. Redeploy after saving.
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `FORWARD_TEST_TOKEN` | Yes | Bearer secret the EA sends. Generate with `openssl rand -base64 32`. `POST /api/forward-test/events` returns 401 without it and 503 if this variable is missing. |
+| `BLOB_READ_WRITE_TOKEN` | Yes on Vercel | Read-write token for the private Blob store. Create a Blob store on the project (**Storage → Create → Blob**) and connect it to this project. Vercel injects the token. Without it, posts return 503 and the page has nothing to read. |
+
+Local `npm run dev` with no `BLOB_READ_WRITE_TOKEN` writes to `.data/forward-test/book.json` (gitignored). On Vercel the filesystem is not used.
+
+### Endpoint the MT5 EA should call
+
+```http
+POST https://dan-c.vercel.app/api/forward-test/events
+Authorization: Bearer <FORWARD_TEST_TOKEN>
+Content-Type: application/json
+```
+
+Allow that URL under MT5 **Tools → Options → Expert Advisors → Allow WebRequest for listed URL**.
+
+Public read (no token):
+
+```http
+GET https://dan-c.vercel.app/api/forward-test/summary
+```
+
+Page: `https://dan-c.vercel.app/forward-test`
+
+`id` is the EA ticket for `open` and `close` (same ticket, different `type`). For `equity`, use a stable snapshot id such as the bar time. `market` must be `US30`, `NAS100`, `XAUUSD`, or `DE40`. `symbol` is the broker symbol. Timestamps should be ISO-8601 UTC (`2026-10-02T08:00:00Z`). `YYYY.MM.DD HH:MM:SS` is accepted and stored as UTC. `side` may be `long` or `buy`.
+
+Open:
+
+```json
+{
+  "type": "open",
+  "id": "12345678",
+  "market": "XAUUSD",
+  "symbol": "XAUUSD",
+  "side": "long",
+  "openedAt": "2026-10-02T08:00:00Z",
+  "entry": 2650.2,
+  "stop": 2635.4,
+  "lots": 0.1,
+  "riskPct": 1
+}
+```
+
+Close:
+
+```json
+{
+  "type": "close",
+  "id": "12345678",
+  "market": "XAUUSD",
+  "symbol": "XAUUSD",
+  "side": "long",
+  "openedAt": "2026-10-02T08:00:00Z",
+  "closedAt": "2026-10-03T16:00:00Z",
+  "entry": 2650.2,
+  "stop": 2635.4,
+  "exit": 2672.8,
+  "lots": 0.1,
+  "riskPct": 1,
+  "reason": "chandelier",
+  "pnl": 48.5,
+  "rMultiple": 1.2
+}
+```
+
+Equity snapshot (`pnl` is GBP):
+
+```json
+{
+  "type": "equity",
+  "id": "2026-10-03T16:00:00Z",
+  "equity": 5048.5,
+  "balance": 5048.5,
+  "at": "2026-10-03T16:00:00Z"
+}
+```
+
+Send a sample against a local server:
+
+```bash
+FORWARD_TEST_TOKEN=dev-token node scripts/post-test-event.mjs
+FORWARD_TEST_TOKEN=dev-token node scripts/post-test-event.mjs --type close
+FORWARD_TEST_TOKEN=dev-token node scripts/post-test-event.mjs --type equity
+```
+
+Posting to `https://dan-c.vercel.app` is refused unless you pass `--confirm-remote`. Parser checks: `node --experimental-strip-types scripts/check-forward-test.mts`.
 
 ## Deploy on Vercel
 

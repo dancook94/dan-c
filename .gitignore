@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local forward-test event store (dev only; production uses Vercel Blob)
+.data/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

@@ -10,6 +10,7 @@ const NAV = [
   { href: "/", label: "Home" },
   { href: "/results", label: "Results" },
   { href: "/backtesting", label: "Backtesting" },
+  { href: "/forward-test", label: "Forward test" },
   { href: "/backtesting/dual-momentum", label: "Dual momentum" },
   { href: "/backtesting/tsmom", label: "TSMOM" },
   { href: "/backtesting/vol-target", label: "Vol-target" },

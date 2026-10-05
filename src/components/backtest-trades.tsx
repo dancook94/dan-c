@@ -6,11 +6,17 @@ import { MARKET_FILTERS, type BacktestTrade } from "@/lib/backtesting";
 
 const PAGE_SIZE = 10;
 
-function formatClosed(iso: string) {
+function formatClosed(iso: string, withTime: boolean) {
   return new Intl.DateTimeFormat("en-GB", {
     dateStyle: "medium",
+    timeStyle: withTime ? "short" : undefined,
     timeZone: "UTC",
   }).format(new Date(iso));
+}
+
+function formatPrice(value: number | undefined) {
+  if (value === undefined || Number.isNaN(value)) return "—";
+  return formatNumber(value, 5);
 }
 
 export function BacktestTrades({
@@ -21,6 +27,10 @@ export function BacktestTrades({
   howToReplace,
   marketFilters = MARKET_FILTERS,
   dataFile = "public/data/backtesting/trades.json",
+  title = "Trade log",
+  emptyMessage,
+  showTime = false,
+  showDetail = false,
 }: {
   trades: BacktestTrade[];
   sample: boolean;
@@ -29,10 +39,15 @@ export function BacktestTrades({
   howToReplace: string;
   marketFilters?: readonly string[];
   dataFile?: string;
+  title?: string;
+  emptyMessage?: string;
+  showTime?: boolean;
+  showDetail?: boolean;
 }) {
   const [market, setMarket] = useState("All");
   const [page, setPage] = useState(1);
   const showNotes = trades.some((trade) => Boolean(trade.notes));
+  const columnCount = 6 + (showNotes ? 1 : 0) + (showDetail ? 3 : 0);
 
   const filtered = useMemo(() => {
     if (market === "All") return trades;
@@ -47,7 +62,7 @@ export function BacktestTrades({
     <section className="overflow-hidden rounded-lg border border-border bg-surface shadow-card">
       <div className="flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-sm font-semibold text-ink">Trade log</h2>
+          <h2 className="text-sm font-semibold text-ink">{title}</h2>
           <p className="mt-1 text-xs text-ink-muted">
             {sample
               ? `SAMPLE · ${trades.length} labelled rows of ${new Intl.NumberFormat("en-GB").format(fullTradeCount)} research trades`
@@ -94,7 +109,16 @@ export function BacktestTrades({
               <th className="px-5 py-3 font-medium">Closed</th>
               <th className="px-5 py-3 font-medium">ID</th>
               <th className="px-5 py-3 font-medium">Market</th>
+              {showDetail ? (
+                <th className="px-5 py-3 font-medium">Symbol</th>
+              ) : null}
               <th className="px-5 py-3 font-medium">Side</th>
+              {showDetail ? (
+                <th className="px-5 py-3 font-medium">Entry</th>
+              ) : null}
+              {showDetail ? (
+                <th className="px-5 py-3 font-medium">Exit</th>
+              ) : null}
               <th className="px-5 py-3 font-medium">P&amp;L</th>
               <th className="px-5 py-3 font-medium">R</th>
               {showNotes ? (
@@ -106,12 +130,16 @@ export function BacktestTrades({
             {slice.length === 0 ? (
               <tr>
                 <td
-                  colSpan={showNotes ? 7 : 6}
+                  colSpan={columnCount}
                   className="px-5 py-10 text-center text-ink-muted"
                 >
-                  No trades in this view. Add rows to{" "}
-                  <code className="font-mono text-xs">{dataFile}</code>
-                  .
+                  {emptyMessage ?? (
+                    <>
+                      No trades in this view. Add rows to{" "}
+                      <code className="font-mono text-xs">{dataFile}</code>
+                      .
+                    </>
+                  )}
                 </td>
               </tr>
             ) : (
@@ -120,7 +148,7 @@ export function BacktestTrades({
                 return (
                   <tr key={trade.id} className="border-t border-border">
                     <td className="px-5 py-3 text-ink-muted">
-                      {formatClosed(trade.closedAt)}
+                      {formatClosed(trade.closedAt, showTime)}
                     </td>
                     <td className="px-5 py-3 font-mono text-xs">
                       {trade.id}
@@ -131,7 +159,22 @@ export function BacktestTrades({
                       ) : null}
                     </td>
                     <td className="px-5 py-3">{trade.market}</td>
+                    {showDetail ? (
+                      <td className="px-5 py-3 font-mono text-xs">
+                        {trade.symbol ?? "—"}
+                      </td>
+                    ) : null}
                     <td className="px-5 py-3 capitalize">{trade.side}</td>
+                    {showDetail ? (
+                      <td className="px-5 py-3 tabular-nums">
+                        {formatPrice(trade.entry)}
+                      </td>
+                    ) : null}
+                    {showDetail ? (
+                      <td className="px-5 py-3 tabular-nums">
+                        {formatPrice(trade.exit)}
+                      </td>
+                    ) : null}
                     <td
                       className={`px-5 py-3 tabular-nums ${
                         negative

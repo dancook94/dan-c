@@ -15,15 +15,42 @@ import {
   YAxis,
 } from "recharts";
 
+function parsePointDate(iso: string) {
+  return new Date(iso.includes("T") ? iso : `${iso}T00:00:00Z`);
+}
+
 function formatAxisDate(iso: string) {
   return iso.slice(0, 4);
 }
 
+function formatDayTick(iso: string) {
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  }).format(parsePointDate(iso));
+}
+
 function formatTooltipDate(iso: string) {
+  const hasTime = iso.includes("T");
   return new Intl.DateTimeFormat("en-GB", {
     dateStyle: "medium",
+    timeStyle: hasTime ? "short" : undefined,
     timeZone: "UTC",
-  }).format(new Date(`${iso}T00:00:00Z`));
+  }).format(parsePointDate(iso));
+}
+
+function dayTicks(points: EquityPoint[]) {
+  if (points.length <= 6) return points.map((point) => point.date);
+  const indexes = new Set<number>([0, points.length - 1]);
+  const steps = 4;
+  for (let step = 1; step < steps; step += 1) {
+    indexes.add(Math.round((step * (points.length - 1)) / steps));
+  }
+  return [...indexes]
+    .sort((a, b) => a - b)
+    .map((index) => points[index]?.date)
+    .filter((date): date is string => Boolean(date));
 }
 
 function formatCompactMoney(value: number) {
@@ -38,16 +65,24 @@ export function BacktestEquityChart({
   caption,
   badge = "Illustrative reconstruction",
   emptyLabel = "Daily series pending",
+  title = "Historical equity curve",
+  seriesLabel = "Account equity (GBP)",
+  axis = "year",
+  yDomain = ["dataMin - 800", "dataMax + 1200"],
 }: {
   points: EquityPoint[];
   annotations: EquityAnnotation[];
   caption: string;
   badge?: string;
   emptyLabel?: string;
+  title?: string;
+  seriesLabel?: string;
+  axis?: "year" | "day";
+  yDomain?: [number | string, number | string];
 }) {
   const hasPath = points.length >= 2;
-  const { yearTicks, maxDd, inSample, maxDdPoint } = useMemo(() => {
-    const ticks = points
+  const { ticks, maxDd, inSample, maxDdPoint } = useMemo(() => {
+    const yearTicks = points
       .filter(
         (point, index, arr) =>
           index === 0 ||
@@ -57,23 +92,21 @@ export function BacktestEquityChart({
     const maxDrawdown = annotations.find((item) => item.type === "max_drawdown");
     const sampleEnd = annotations.find((item) => item.type === "in_sample_end");
     return {
-      yearTicks: ticks,
+      ticks: axis === "day" ? dayTicks(points) : yearTicks,
       maxDd: maxDrawdown,
       inSample: sampleEnd,
       maxDdPoint: maxDrawdown
         ? points.find((point) => point.date === maxDrawdown.date)
         : undefined,
     };
-  }, [annotations, points]);
+  }, [annotations, axis, points]);
 
   return (
     <figure className="rounded-lg border border-border bg-surface p-5 shadow-card">
       <figcaption className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
         <div>
-          <h2 className="text-sm font-semibold text-ink">
-            Historical equity curve
-          </h2>
-          <p className="text-xs text-ink-muted">Account equity (GBP)</p>
+          <h2 className="text-sm font-semibold text-ink">{title}</h2>
+          <p className="text-xs text-ink-muted">{seriesLabel}</p>
         </div>
         <p className="text-xs font-medium tracking-wide text-ink-muted uppercase">
           {badge}
@@ -90,8 +123,8 @@ export function BacktestEquityChart({
             <CartesianGrid stroke="var(--dc-border)" vertical={false} />
             <XAxis
               dataKey="date"
-              ticks={yearTicks}
-              tickFormatter={formatAxisDate}
+              ticks={ticks}
+              tickFormatter={axis === "day" ? formatDayTick : formatAxisDate}
               tick={{ fill: "var(--dc-ink-muted)", fontSize: 11 }}
               axisLine={{ stroke: "var(--dc-border)" }}
               tickLine={false}
@@ -104,7 +137,7 @@ export function BacktestEquityChart({
               axisLine={false}
               tickLine={false}
               width={64}
-              domain={["dataMin - 800", "dataMax + 1200"]}
+              domain={yDomain}
             />
             <Tooltip
               content={({ active, payload, label }) => {
