@@ -1,8 +1,10 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import {
+  BlobNotFoundError,
   BlobPreconditionFailedError,
   get,
+  head,
   put,
 } from "@vercel/blob";
 import {
@@ -58,7 +60,7 @@ export async function loadForwardTestSummary(): Promise<ForwardTestSummary> {
     return summarizeForwardTest([], { storage });
   }
   try {
-    const { book } = await readBook();
+    const book = await readBook();
     const events = onVercel()
       ? omitSampleForwardTestEvents(book.events)
       : book.events;
@@ -94,60 +96,69 @@ export async function upsertForwardTestEvent(
 }
 
 async function upsertBlob(event: ForwardTestEvent): Promise<{ created: boolean }> {
-  let lastError: unknown;
-  for (let attempt = 0; attempt < 5; attempt += 1) {
-    const loaded = await readBlob();
-    const applied = applyForwardTestEvent(bookForWrite(loaded.book), event);
-    try {
-      await put(BLOB_PATH, JSON.stringify(applied.book), {
-        access: "private",
-        addRandomSuffix: false,
-        allowOverwrite: true,
-        contentType: "application/json",
-        cacheControlMaxAge: 0,
-        ...(loaded.etag ? { ifMatch: loaded.etag } : {}),
-      });
-      return { created: applied.created };
-    } catch (error) {
-      if (error instanceof BlobPreconditionFailedError) {
-        lastError = error;
-        continue;
-      }
-      throw error;
-    }
+  const book = await readBlob();
+  const applied = applyForwardTestEvent(bookForWrite(book), event);
+  const body = JSON.stringify(applied.book);
+  // get() exposes the content-URL ETag. put({ ifMatch }) checks the Blob API
+  // ETag from head(), and those values do not match.
+  const etag = await blobMetadataEtag();
+  try {
+    await putBook(body, etag);
+  } catch (error) {
+    if (!(error instanceof BlobPreconditionFailedError)) throw error;
+    // The EA is the only writer, so a mismatch is a bad precondition, not a
+    // concurrent update. Retry once without ifMatch.
+    await putBook(body, null);
   }
-  throw lastError instanceof Error
-    ? lastError
-    : new Error("Could not save the forward-test event.");
+  return { created: applied.created };
+}
+
+async function blobMetadataEtag(): Promise<string | null> {
+  try {
+    const metadata = await head(BLOB_PATH);
+    return metadata.etag || null;
+  } catch (error) {
+    if (error instanceof BlobNotFoundError) return null;
+    throw error;
+  }
+}
+
+async function putBook(body: string, etag: string | null): Promise<void> {
+  await put(BLOB_PATH, body, {
+    access: "private",
+    addRandomSuffix: false,
+    allowOverwrite: true,
+    contentType: "application/json",
+    cacheControlMaxAge: 0,
+    ...(etag ? { ifMatch: etag } : {}),
+  });
 }
 
 async function upsertLocal(event: ForwardTestEvent): Promise<{ created: boolean }> {
-  const { book } = await readLocal();
+  const book = await readLocal();
   const applied = applyForwardTestEvent(bookForWrite(book), event);
   await writeLocal(applied.book);
   return { created: applied.created };
 }
 
-async function readBook(): Promise<{ book: ForwardTestBook; etag: string | null }> {
+async function readBook(): Promise<ForwardTestBook> {
   if (forwardTestStorageMode() === "blob") return readBlob();
   return readLocal();
 }
 
-async function readBlob(): Promise<{ book: ForwardTestBook; etag: string | null }> {
+async function readBlob(): Promise<ForwardTestBook> {
   const result = await get(BLOB_PATH, { access: "private", useCache: false });
-  if (!result || result.statusCode !== 200) {
-    return { book: emptyForwardTestBook(), etag: null };
-  }
+  if (!result || result.statusCode !== 200) return emptyForwardTestBook();
   const text = await new Response(result.stream).text();
-  return { book: parseStoredBook(text), etag: result.blob.etag };
+  return parseStoredBook(text);
 }
 
-async function readLocal(): Promise<{ book: ForwardTestBook; etag: string | null }> {
+async function readLocal(): Promise<ForwardTestBook> {
   try {
     const text = await readFile(LOCAL_PATH, "utf8");
-    return { book: parseStoredBook(text), etag: null };
+    return parseStoredBook(text);
   } catch (error) {
-    if (isNotFound(error)) return { book: emptyForwardTestBook(), etag: null };
+    if (isNotFound(error)) return emptyForwardTestBook();
     throw error;
   }
 }

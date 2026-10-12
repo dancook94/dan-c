@@ -17,6 +17,21 @@ import {
 export const runtime = "nodejs";
 
 const MAX_BODY_BYTES = 32_000;
+const SECRET_ENV_KEYS = ["BLOB_READ_WRITE_TOKEN", "FORWARD_TEST_TOKEN"] as const;
+
+function loggedErrorParts(error: unknown): [string, string] {
+  if (!(error instanceof Error)) return ["unknown", "unknown"];
+  return [error.constructor.name, redactSecrets(error.message)];
+}
+
+function redactSecrets(message: string): string {
+  let safe = message;
+  for (const key of SECRET_ENV_KEYS) {
+    const secret = process.env[key];
+    if (secret) safe = safe.split(secret).join("[redacted]");
+  }
+  return safe;
+}
 
 export async function POST(request: Request) {
   if (!forwardTestTokenConfigured()) {
@@ -87,20 +102,16 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     if (error instanceof ForwardTestCapacityError) {
-      return NextResponse.json({ ok: false, error: error.message }, { status: 409 });
+      return NextResponse.json({ ok: false, error: error.message }, { status: 503 });
     }
     if (error instanceof ForwardTestStoreError) {
-      const status =
-        error.code === "unconfigured" ? 503 : error.code === "sample" ? 400 : 500;
+      const status = error.code === "sample" ? 400 : 503;
       return NextResponse.json({ ok: false, error: error.message }, { status });
     }
-    console.error(
-      "forward-test write failed",
-      error instanceof Error ? error.name : "unknown",
-    );
+    console.error("forward-test write failed", ...loggedErrorParts(error));
     return NextResponse.json(
       { ok: false, error: "Could not store the event." },
-      { status: 500 },
+      { status: 503 },
     );
   }
 }
