@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://www.dan-c.co.uk/schemas/crypto-forward.json",
+  "title": "dan-c crypto paper forward-test snapshot",
+  "description": "Full book posted by the daily paper job to POST /api/crypto-forward/update and returned by GET /api/crypto-forward/summary. USDT notionals. Not live orders. The parser in src/lib/crypto-forward.ts is the enforcement; this file is the contract.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "updatedAt",
+    "startDate",
+    "reviewDate",
+    "currency",
+    "lines",
+    "benchmarks",
+    "trades"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the daily job built this snapshot. Stored as UTC ISO-8601 with milliseconds."
+    },
+    "startDate": {
+      "type": "string",
+      "format": "date",
+      "description": "YYYY-MM-DD. Signal bar that opened the test (the 2026-10-11 daily close). First fills are the next daily open."
+    },
+    "reviewDate": {
+      "type": "string",
+      "format": "date",
+      "description": "YYYY-MM-DD review, on or after startDate. The book keeps running after this date unless stopped."
+    },
+    "currency": {
+      "const": "USDT",
+      "description": "All equity, cash, price, and cost figures are USDT. Not GBP."
+    },
+    "lines": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "description": "Paper books. The first entry is the primary book (BTC+ETH while close > 100-day SMA).",
+      "items": { "$ref": "#/$defs/series" }
+    },
+    "benchmarks": {
+      "type": "array",
+      "maxItems": 8,
+      "description": "Same shape as lines. Buy-and-hold and the S&P 500 price index live here, not in lines.",
+      "items": { "$ref": "#/$defs/series" }
+    },
+    "trades": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": { "$ref": "#/$defs/trade" }
+    }
+  },
+  "$defs": {
+    "series": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "equity",
+        "returnPct",
+        "maxDDPct",
+        "cash",
+        "positions",
+        "equityCurve"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,31}$",
+          "description": "Short slug, unique across lines and benchmarks. Not the word date. Suggested: A, B, C, BH, SPX."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "equity": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Current marked equity in USDT."
+        },
+        "returnPct": {
+          "type": "number",
+          "minimum": -100,
+          "description": "Percent return from the 5,000 USDT start. 1.5 means +1.5%."
+        },
+        "maxDDPct": {
+          "type": "number",
+          "minimum": -100,
+          "maximum": 0,
+          "description": "Peak-to-trough return in percent. Zero, or negative. A 57% drawdown is -57."
+        },
+        "cash": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Uninvested USDT in this book. An index benchmark may send 0."
+        },
+        "positions": {
+          "type": "array",
+          "maxItems": 12,
+          "items": { "$ref": "#/$defs/position" }
+        },
+        "equityCurve": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4000,
+          "description": "Stored sorted by date ascending. Dates are unique and on or after startDate.",
+          "items": { "$ref": "#/$defs/point" }
+        }
+      }
+    },
+    "position": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["symbol", "qty", "weightPct"],
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9]{0,15}$",
+          "description": "Uppercase symbol, such as BTC or ETH. Unique within the book."
+        },
+        "qty": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Coin units held."
+        },
+        "weightPct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percent of that coin's sleeve that is invested. 100 means the whole sleeve is in the coin."
+        }
+      }
+    },
+    "point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["date", "equity"],
+      "properties": {
+        "date": { "type": "string", "format": "date" },
+        "equity": {
+          "type": "number",
+          "minimum": 0,
+          "description": "USDT equity at the daily close."
+        }
+      }
+    },
+    "trade": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["date", "line", "symbol", "side", "qty", "price", "cost"],
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Fill time. Stored as UTC ISO-8601 with milliseconds. The UTC date must be on or after startDate."
+        },
+        "line": {
+          "type": "string",
+          "description": "Id of a line or a benchmark."
+        },
+        "symbol": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9]{0,15}$"
+        },
+        "side": { "enum": ["BUY", "SELL"] },
+        "qty": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "price": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Fill price in USDT."
+        },
+        "cost": {
+          "type": "number",
+          "minimum": 0,
+          "description": "USDT fee on this fill. The test charges 0.15% of traded notional."
+        }
+      }
+    }
+  }
+}

@@ -69,6 +69,38 @@ export function formatNumber(
   );
 }
 
+/** USDT is not an ISO currency, so format it as a grouped amount plus the code. */
+export function formatUsdt(
+  value: number | null | undefined,
+  digits = 2,
+): string {
+  return formatMetric(value, (n) => {
+    const body = new Intl.NumberFormat("en-GB", {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
+    }).format(n);
+    return `${body} USDT`;
+  });
+}
+
+export function formatCryptoQty(value: number | null | undefined): string {
+  return formatMetric(value, (n) =>
+    new Intl.NumberFormat("en-GB", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 8,
+    }).format(n),
+  );
+}
+
+export function formatCryptoPrice(value: number | null | undefined): string {
+  return formatMetric(value, (n) =>
+    new Intl.NumberFormat("en-GB", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 8,
+    }).format(n),
+  );
+}
+
 export function formatMonth(month: string): string {
   const [year, mm] = month.split("-");
   const date = new Date(Date.UTC(Number(year), Number(mm) - 1, 1));

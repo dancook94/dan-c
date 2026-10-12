@@ -27,6 +27,12 @@ export function SiteFooter() {
               Forward test
             </Link>
             <Link
+              href="/crypto-forward-test"
+              className="text-ink-muted hover:text-ink"
+            >
+              Crypto forward
+            </Link>
+            <Link
               href="/backtesting/dual-momentum"
               className="text-ink-muted hover:text-ink"
             >

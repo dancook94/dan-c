@@ -19,6 +19,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | `/results` | Equity, drawdown, KPIs, monthly table, trade log |
 | `/backtesting` | Hypothetical H4 Donchian multi-market research deep-dive |
 | `/forward-test` | Demo-account forward test of that H4 Donchian book. Not live money |
+| `/crypto-forward-test` | Paper BTC/ETH trend forward test. No real orders. Priced in USDT |
 | `/backtesting/dual-momentum` | Hypothetical four-market dual momentum research deep-dive |
 | `/backtesting/tsmom` | Hypothetical four-market 12–1 month TSMOM research deep-dive |
 | `/backtesting/vol-target` | Hypothetical four-market vol-target SMA200 research deep-dive |
@@ -209,6 +210,102 @@ FORWARD_TEST_TOKEN=dev-token node scripts/post-test-event.mjs --type equity
 ```
 
 Posting to `https://dan-c.vercel.app` is refused unless you pass `--confirm-remote`. Parser checks: `node --experimental-strip-types scripts/check-forward-test.mts`.
+
+The BTC/ETH paper book is a different endpoint. Do not post it to `/api/forward-test/events`, and do not write `forward-test/book.json` from that job.
+
+## Crypto forward test (paper, USDT)
+
+`/crypto-forward-test` is a six-month **paper** forward test of a daily BTC and ETH trend rule. No real orders and no exchange account. It started at the **11 October 2026** daily close, with the first fills at the **12 October** open, and the review date is **12 April 2027**. The book keeps running after that review unless it is stopped.
+
+Three lines each start at **5,000** notional, split half and half between BTC and ETH, marked in **USDT** (not GBP), with a **0.15%** cost on every fill:
+
+| Id | Book |
+| --- | --- |
+| `A` | Primary. Hold each coin while its daily close is above its 100-day SMA. |
+| `B` | Shadow. The same rule with a 150-day SMA. |
+| `C` | Shadow. The 100-day rule sized to a 40% volatility target. |
+| `BH` | Benchmark. 50/50 BTC/ETH buy and hold. |
+| `SPX` | Benchmark. S&P 500 price index, rebased, **no dividends**. |
+
+Those ids are a convention. The page labels whatever `name` the snapshot sends. `lines[0]` is the primary book. Benchmarks are not mixed into `lines`.
+
+The page shows every equity curve against the benchmarks, current positions, the fill list, and the limits of the test: paper only, about 13 trades a year so six months cannot prove an edge, prices in USDT, the S&P line has no dividends, and the research backtest was about 37.4% a year with a −57% drawdown that depended on a few big winners. Until the first snapshot arrives the page says so, instead of inventing a curve.
+
+A daily job on another machine replaces the whole book. The site stores that JSON in the existing private Vercel Blob at `crypto-forward/book.json`. One writer, so the save is a plain `put` with `allowOverwrite`. It does not read or write `forward-test/book.json`.
+
+`POST /api/crypto-forward/update` checks `Authorization: Bearer` against the existing `FORWARD_TEST_TOKEN` (the same variable as the forex demo). A missing variable is 503. A wrong token is 401. The handler does not log the token or the Authorization header. `GET /api/crypto-forward/summary` is public: the stored book, or `{ "empty": true }` when nothing has been posted yet.
+
+Local `npm run dev` with no `BLOB_READ_WRITE_TOKEN` writes `.data/crypto-forward/book.json` (gitignored). On Vercel the filesystem is not used.
+
+```http
+POST https://dan-c.vercel.app/api/crypto-forward/update
+Authorization: Bearer <FORWARD_TEST_TOKEN>
+Content-Type: application/json
+```
+
+```http
+GET https://dan-c.vercel.app/api/crypto-forward/summary
+```
+
+Page: `https://dan-c.vercel.app/crypto-forward-test`
+
+### Snapshot schema
+
+Machine-readable copy: `data/crypto-forward.schema.json`. The parser in `src/lib/crypto-forward.ts` enforces it. Extra fields are rejected. On accept, timestamps are rewritten to UTC ISO-8601 with milliseconds, `side` is stored as `BUY` or `SELL`, and each `equityCurve` is sorted by `date` ascending.
+
+`returnPct` is a percent (1.5 means +1.5%). `maxDDPct` is the peak-to-trough return and must be from -100 to 0 (a 57% drawdown is -57). `weightPct` is the percent of that coin's sleeve, from 0 to 100. `cash`, `equity`, `price`, and `cost` are USDT. `cost` is the fee on that fill.
+
+```json
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-10-12T07:32:16Z",
+  "startDate": "2026-10-11",
+  "reviewDate": "2027-04-12",
+  "currency": "USDT",
+  "lines": [
+    {
+      "id": "A",
+      "name": "BTC+ETH SMA100",
+      "equity": 5000,
+      "returnPct": 0,
+      "maxDDPct": 0,
+      "cash": 0,
+      "positions": [
+        { "symbol": "BTC", "qty": 0.02979781, "weightPct": 100 },
+        { "symbol": "ETH", "qty": 0.98396321, "weightPct": 100 }
+      ],
+      "equityCurve": [{ "date": "2026-10-11", "equity": 5000 }]
+    }
+  ],
+  "benchmarks": [
+    {
+      "id": "SPX",
+      "name": "S&P 500 price index",
+      "equity": 5000,
+      "returnPct": 0,
+      "maxDDPct": 0,
+      "cash": 0,
+      "positions": [],
+      "equityCurve": [{ "date": "2026-10-11", "equity": 5000 }]
+    }
+  ],
+  "trades": [
+    {
+      "date": "2026-10-12T00:00:00Z",
+      "line": "A",
+      "symbol": "BTC",
+      "side": "BUY",
+      "qty": 0.02979781,
+      "price": 83773.12,
+      "cost": 3.74438342
+    }
+  ]
+}
+```
+
+The live job should send all three lines and both benchmarks. The block above is the shape, using the flat open of the book (0% return) so it is not a made-up performance path.
+
+Parser checks: `node --experimental-strip-types scripts/check-crypto-forward.mts`.
 
 ## Deploy on Vercel
 
