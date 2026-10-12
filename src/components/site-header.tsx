@@ -11,6 +11,7 @@ const NAV = [
   { href: "/results", label: "Results" },
   { href: "/backtesting", label: "Backtesting" },
   { href: "/forward-test", label: "Forward test" },
+  { href: "/crypto-forward-test", label: "Crypto forward" },
   { href: "/backtesting/dual-momentum", label: "Dual momentum" },
   { href: "/backtesting/tsmom", label: "TSMOM" },
   { href: "/backtesting/vol-target", label: "Vol-target" },
@@ -38,7 +39,7 @@ export function SiteHeader() {
 
         <nav
           aria-label="Primary"
-          className="hidden items-center gap-0.5 lg:flex"
+          className="hidden items-center gap-0.5 xl:flex"
         >
           {NAV.map((item) => {
             const active = isActive(pathname, item.href);
@@ -46,7 +47,7 @@ export function SiteHeader() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`rounded-md px-2.5 py-2 text-sm font-medium transition-colors ${
+                className={`shrink-0 rounded-md px-2.5 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
                   active
                     ? "text-ink"
                     : "text-ink-muted hover:text-ink"
@@ -64,10 +65,10 @@ export function SiteHeader() {
           })}
         </nav>
 
-        <div className="hidden lg:block">
+        <div className="hidden shrink-0 xl:block">
           <Link
             href="/results"
-            className="rounded-md bg-accent px-3.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent-hover"
+            className="rounded-md bg-accent px-3.5 py-2 text-sm font-semibold whitespace-nowrap text-white transition-colors hover:bg-accent-hover"
           >
             View results
           </Link>
@@ -75,7 +76,7 @@ export function SiteHeader() {
 
         <button
           type="button"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-border bg-surface text-ink lg:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-border bg-surface text-ink xl:hidden"
           aria-expanded={open}
           aria-controls="mobile-nav"
           onClick={() => setOpen((value) => !value)}
@@ -98,7 +99,7 @@ export function SiteHeader() {
       {open ? (
         <div
           id="mobile-nav"
-          className="border-t border-border bg-surface lg:hidden"
+          className="border-t border-border bg-surface xl:hidden"
         >
           <Container className="flex flex-col py-3">
             {NAV.map((item) => {
